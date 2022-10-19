@@ -1,8 +1,8 @@
-package ru.practicum.user;
+package ru.practicum.mapper.user;
 
 import org.mapstruct.Mapper;
-import ru.practicum.dto.NewUserRequest;
-import ru.practicum.dto.UserDto;
+import ru.practicum.dto.user.NewUserRequest;
+import ru.practicum.dto.user.UserDto;
 import ru.practicum.entity.User;
 
 import java.util.List;

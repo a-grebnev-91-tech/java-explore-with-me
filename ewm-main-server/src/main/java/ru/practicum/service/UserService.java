@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import ru.practicum.dto.NewUserRequest;
-import ru.practicum.dto.UserDto;
+import ru.practicum.dto.user.NewUserRequest;
+import ru.practicum.dto.user.UserDto;
 import ru.practicum.entity.User;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.user.UserMapper;
+import ru.practicum.mapper.user.UserMapper;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.OffsetPageable;
 
@@ -33,7 +33,7 @@ public class UserService {
         repo.delete(user);
     }
 
-    public List<UserDto> getAll(List<Long> ids, int from, int size) {
+    public List<UserDto> findAll(List<Long> ids, int from, int size) {
         OffsetPageable pageable = OffsetPageable.of(from, size);
         Page<User> users;
         if (ids == null) {

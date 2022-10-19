@@ -9,11 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.data.domain.PageImpl;
-import ru.practicum.dto.NewUserRequest;
-import ru.practicum.dto.UserDto;
+import ru.practicum.dto.user.NewUserRequest;
+import ru.practicum.dto.user.UserDto;
 import ru.practicum.entity.User;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.user.UserMapper;
+import ru.practicum.mapper.user.UserMapper;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.OffsetPageable;
 
@@ -98,7 +98,7 @@ class UserServiceTest {
         when(repo.findAllByIdIn(List.of(ID), pageable)).thenReturn(new PageImpl<>(List.of(user)));
         when(mapper.batchEntitiesToDto(List.of(user))).thenReturn(List.of(outputDto));
 
-        List<UserDto> outputDtos = service.getAll(null, 0, 1);
+        List<UserDto> outputDtos = service.findAll(null, 0, 1);
         assertNotNull(outputDtos);
         assertEquals(1, outputDtos.size());
         assertEquals(ID, outputDtos.get(0).getId());
@@ -106,7 +106,7 @@ class UserServiceTest {
         assertEquals(EMAIL, outputDtos.get(0).getEmail());
         verify(repo).findAll(pageable);
 
-        outputDtos = service.getAll(List.of(ID), 0, 1);
+        outputDtos = service.findAll(List.of(ID), 0, 1);
         assertNotNull(outputDtos);
         assertEquals(1, outputDtos.size());
         assertEquals(ID, outputDtos.get(0).getId());
