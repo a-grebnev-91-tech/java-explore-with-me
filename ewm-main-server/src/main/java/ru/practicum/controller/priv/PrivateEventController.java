@@ -14,5 +14,5 @@ public class PrivateEventController {
     private final EventService service;
 
     @GetMapping
-    public List<EventShortDto> getBy
+    public List<EventShortDto> getByInitiator()
 }
