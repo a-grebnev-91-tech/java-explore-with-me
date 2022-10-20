@@ -2,7 +2,7 @@ package ru.practicum.dto.event;
 
 import lombok.Getter;
 
-import javax.validation.ValidationException;
+import ru.practicum.exception.ValidationException;
 
 @Getter
 public class Location {

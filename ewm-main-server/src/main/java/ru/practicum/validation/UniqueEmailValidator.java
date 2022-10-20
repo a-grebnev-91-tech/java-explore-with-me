@@ -1,12 +1,14 @@
 package ru.practicum.validation;
 
 import lombok.RequiredArgsConstructor;
-import ru.practicum.exception.ConflictEmailException;
+import org.springframework.stereotype.Component;
+import ru.practicum.exception.ConflictException;
 import ru.practicum.repository.UserRepository;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+@Component
 @RequiredArgsConstructor
 public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, String> {
     private final UserRepository repo;
@@ -14,7 +16,11 @@ public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, St
     @Override
     public boolean isValid(String email, ConstraintValidatorContext constraintValidatorContext) {
         if (email == null) return false;
-        if (repo.findByEmail(email).isPresent()) return true;
-        else throw new ConflictEmailException("Email should be unique");
+        if (repo.findByEmail(email).isEmpty()) return true;
+        else
+            throw new ConflictException(
+                    String.format("User with email %s already exist", email),
+                    "Email should be unique"
+            );
     }
 }
