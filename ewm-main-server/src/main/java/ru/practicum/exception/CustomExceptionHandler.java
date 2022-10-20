@@ -15,6 +15,7 @@ public class CustomExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     @ExceptionHandler(ConflictException.class)
     public ApiError handleConflict(ConflictException ex) {
+        log.info("Conflict exception has occurred. Message: {}", ex.getMessage());
         return new ApiError(ex.getMessage(), ex.getReason(), HttpStatus.CONFLICT.getReasonPhrase().toUpperCase());
     }
 
@@ -25,6 +26,7 @@ public class CustomExceptionHandler {
             ValidationException.class
     })
     public ApiError handleConstraintViolation(Exception ex) {
+        log.info("Validation exception has occurred. Message: {}", ex.getMessage());
         return new ApiError(
                 ex.getMessage(),
                 "Validation failed",

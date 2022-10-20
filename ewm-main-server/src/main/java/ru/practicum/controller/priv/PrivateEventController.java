@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.event.EventFullDto;
-import ru.practicum.dto.event.EventShortDto;
-import ru.practicum.dto.event.UpdateEventRequest;
+import ru.practicum.dto.event.*;
+import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.service.EventService;
 
 import javax.validation.Valid;
@@ -22,6 +21,46 @@ import java.util.List;
 public class PrivateEventController {
     private final EventService service;
 
+    @PostMapping
+    public EventFullDto addEvent(@RequestBody @Valid NewEventDto event, @PathVariable("userId") @Positive long userId) {
+        log.info("User with id {} attempt to create new event {}", userId, event);
+        System.out.println(event.getEventDate());
+        return null;
+    }
+
+    @PatchMapping("/{eventId}")
+    public EventFullDto cancelById(
+            @PathVariable("userId") @Positive long userId,
+            @PathVariable("eventId") @Positive long eventId
+    ) {
+        log.info("User with ID {} attempt to cancel his event with ID {}", userId, eventId);
+        //TODO cancel only PENDING
+        return service.cancelById(userId, eventId);
+    }
+
+    //TODO
+    //если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
+    //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
+    //если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
+    @PatchMapping("/{eventId}/requests/{reqId}/confirm")
+    public ParticipationRequestDto confirmRequest(
+            @PathVariable("userId") @Positive long userId,
+            @PathVariable("eventId") @Positive long eventId,
+            @PathVariable("reqId") @Positive long reqId
+    ) {
+        log.info("User with ID {} attempt to reject request with ID {} for event with ID {}", userId, eventId, reqId);
+        return service.confirmRequest(userId, eventId, reqId);
+    }
+
+    @GetMapping("/{eventId}")
+    public EventFullDto findById(
+            @PathVariable("userId") @Positive long userId,
+            @PathVariable("eventId") @Positive long eventId
+    ) {
+        log.info("User with ID {} attempt to get his event with ID {}", userId, eventId);
+        return service.findById(userId, eventId);
+    }
+
     @GetMapping
     public List<EventShortDto> findByInitiator(
             @PathVariable("userId") @Positive long userId,
@@ -30,6 +69,25 @@ public class PrivateEventController {
     ) {
         log.info("User with id {} attempt to get his events", userId);
         return service.findByInitiator(userId, from, size);
+    }
+
+    @GetMapping("/{eventId}/requests")
+    public List<ParticipationRequestDto> findParticipationRequests(
+            @PathVariable("userId") @Positive long userId,
+            @PathVariable("eventId") @Positive long eventId
+    ) {
+        log.info("User with ID {} attempt to get his participation requests on event with ID {}", userId, eventId);
+        return service.findParticipationRequests(userId, eventId);
+    }
+
+    @PatchMapping("/{eventId}/requests/{reqId}/reject")
+    public ParticipationRequestDto rejectRequest(
+            @PathVariable("userId") @Positive long userId,
+            @PathVariable("eventId") @Positive long eventId,
+            @PathVariable("reqId") @Positive long reqId
+    ) {
+        log.info("User with ID {} attempt to reject request with ID {} for event with ID {}", userId, eventId, reqId);
+        return service.rejectRequest(userId, eventId, reqId);
     }
 
     @PatchMapping
