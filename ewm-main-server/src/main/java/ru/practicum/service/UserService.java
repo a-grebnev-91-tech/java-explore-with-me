@@ -48,7 +48,7 @@ public class UserService {
 
     private User getExistingOrThrow(long userId) {
         return repo.findById(userId).orElseThrow(
-                () -> new NotFoundException(String.format("User with id %d isn't exist", userId)
+                () -> new NotFoundException("User not found", String.format("User with id %d isn't exist", userId)
                 ));
     }
 }

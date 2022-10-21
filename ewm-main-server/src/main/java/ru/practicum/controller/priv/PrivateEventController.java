@@ -24,8 +24,7 @@ public class PrivateEventController {
     @PostMapping
     public EventFullDto addEvent(@RequestBody @Valid NewEventDto event, @PathVariable("userId") @Positive long userId) {
         log.info("User with id {} attempt to create new event {}", userId, event);
-        System.out.println(event.getEventDate());
-        return null;
+        return service.addEvent(event, userId);
     }
 
     @PatchMapping("/{eventId}")

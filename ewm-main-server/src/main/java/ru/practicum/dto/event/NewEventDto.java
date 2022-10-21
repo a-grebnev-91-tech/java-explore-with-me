@@ -17,22 +17,22 @@ import static ru.practicum.util.Constants.DATE_TIME_FORMAT_STRING;
 @Setter
 public class NewEventDto {
     @NotNull
+    @Size(min = 3, max = 120)
+    private String title;
+    @NotNull
     @Size(min = 20, max = 2000)
     private String annotation;
-    @ExistingCategory
-    private long category;
     @NotNull
     @Size(min = 20, max = 7000)
     private String description;
     @EventDateInFuture
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_STRING)
     private LocalDateTime eventDate;
+    @ExistingCategory
+    private long category;
+    private Boolean paid;
+    private Boolean requestModeration;
+    private int participantLimit;
     @NotNull
     private Location location;
-    private Boolean paid;
-    private int participantLimit;
-    private Boolean requestModeration;
-    @NotNull
-    @Size(min = 3, max = 120)
-    private String title;
 }

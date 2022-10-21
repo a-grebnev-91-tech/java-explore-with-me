@@ -19,8 +19,8 @@ public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, St
         if (repo.findByEmail(email).isEmpty()) return true;
         else
             throw new ConflictException(
-                    String.format("User with email %s already exist", email),
-                    "Email should be unique"
+                    "Email should be unique",
+                    String.format("User with email %s already exist", email)
             );
     }
 }
