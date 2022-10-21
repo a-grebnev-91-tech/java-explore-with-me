@@ -8,8 +8,10 @@ import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdateEventRequest;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.entity.Event;
+import ru.practicum.exception.ForbiddenException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.event.EventMapper;
+import ru.practicum.model.EventState;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.UserRepository;
 
@@ -23,13 +25,22 @@ public class EventService {
     private final EventMapper mapper;
 
     public EventFullDto addEvent(NewEventDto event, long userId) {
-        checkExistingOrThrow(userId);
+        checkUserExistingOrThrow(userId);
         Event entity = mapper.dtoToEntity(event, userId);
-        return null;
+        entity = eventRepo.save(entity);
+        return mapper.modelToFullDto(entity);
     }
 
     public EventFullDto cancelById(long userId, long eventId) {
-        return null;
+        checkUserExistingOrThrow(userId);
+        Event event = getEventOrThrow(eventId);
+        if (event.getState() != EventState.PENDING)
+            throw new ForbiddenException(
+                    "Only an event in PENDING state could be canceled",
+                    String.format("Event with id %d in %s state", eventId, event.getState().toString())
+                    );
+        event.setState(EventState.CANCELED);
+        return mapper.modelToFullDto(event);
     }
 
     public ParticipationRequestDto confirmRequest(long userId, long eventId, long reqId) {
@@ -56,8 +67,14 @@ public class EventService {
         return null;
     }
 
-    private void checkExistingOrThrow(long userId) {
+    private void checkUserExistingOrThrow(long userId) {
         if (!userRepo.existsById(userId))
             throw new NotFoundException("User not found", String.format("User with id %d isn't exist", userId));
+    }
+
+    private Event getEventOrThrow(long eventId) {
+        return eventRepo.findById(eventId).orElseThrow(
+                () -> new NotFoundException("Event not found", String.format("Event with id %d isn't exist", eventId))
+        );
     }
 }
