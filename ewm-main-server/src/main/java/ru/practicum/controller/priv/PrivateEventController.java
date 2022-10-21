@@ -37,20 +37,6 @@ public class PrivateEventController {
         return service.cancelById(userId, eventId);
     }
 
-    //TODO
-    //если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
-    //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
-    //если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
-    @PatchMapping("/{eventId}/requests/{reqId}/confirm")
-    public ParticipationRequestDto confirmRequest(
-            @PathVariable("userId") @Positive long userId,
-            @PathVariable("eventId") @Positive long eventId,
-            @PathVariable("reqId") @Positive long reqId
-    ) {
-        log.info("User with ID {} attempt to reject request with ID {} for event with ID {}", userId, eventId, reqId);
-        return service.confirmRequest(userId, eventId, reqId);
-    }
-
     @GetMapping("/{eventId}")
     public EventFullDto findById(
             @PathVariable("userId") @Positive long userId,
@@ -77,16 +63,6 @@ public class PrivateEventController {
     ) {
         log.info("User with ID {} attempt to get his participation requests on event with ID {}", userId, eventId);
         return service.findParticipationRequests(userId, eventId);
-    }
-
-    @PatchMapping("/{eventId}/requests/{reqId}/reject")
-    public ParticipationRequestDto rejectRequest(
-            @PathVariable("userId") @Positive long userId,
-            @PathVariable("eventId") @Positive long eventId,
-            @PathVariable("reqId") @Positive long reqId
-    ) {
-        log.info("User with ID {} attempt to reject request with ID {} for event with ID {}", userId, eventId, reqId);
-        return service.rejectRequest(userId, eventId, reqId);
     }
 
     @PatchMapping

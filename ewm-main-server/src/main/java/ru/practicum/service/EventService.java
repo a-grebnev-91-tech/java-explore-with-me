@@ -8,11 +8,15 @@ import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdateEventRequest;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.entity.Event;
+import ru.practicum.entity.ParticipationRequest;
+import ru.practicum.entity.User;
 import ru.practicum.exception.ForbiddenOperationException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.event.EventMapper;
 import ru.practicum.model.EventState;
+import ru.practicum.model.RequestStatus;
 import ru.practicum.repository.EventRepository;
+import ru.practicum.repository.RequestRepository;
 import ru.practicum.repository.UserRepository;
 
 import java.util.List;
@@ -22,6 +26,7 @@ import java.util.List;
 public class EventService {
     private final EventRepository eventRepo;
     private final UserRepository userRepo;
+    private final RequestRepository requestRepo;
     private final EventMapper mapper;
 
     public EventFullDto addEvent(NewEventDto event, long userId) {
@@ -38,13 +43,9 @@ public class EventService {
             throw new ForbiddenOperationException(
                     "Only an event in PENDING state could be canceled",
                     String.format("Event with id %d in %s state", eventId, event.getState().toString())
-                    );
+            );
         event.setState(EventState.CANCELED);
         return mapper.modelToFullDto(event);
-    }
-
-    public ParticipationRequestDto confirmRequest(long userId, long eventId, long reqId) {
-        return null;
     }
 
     public List<EventShortDto> findByInitiator(long userId, int from, int size) {
@@ -56,10 +57,6 @@ public class EventService {
     }
 
     public EventFullDto updateByInitiator(long userId, UpdateEventRequest dto) {
-        return null;
-    }
-
-    public ParticipationRequestDto rejectRequest(long userId, long eventId, long reqId) {
         return null;
     }
 
