@@ -8,7 +8,7 @@ import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdateEventRequest;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.entity.Event;
-import ru.practicum.exception.ForbiddenException;
+import ru.practicum.exception.ForbiddenOperationException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.event.EventMapper;
 import ru.practicum.model.EventState;
@@ -35,7 +35,7 @@ public class EventService {
         checkUserExistingOrThrow(userId);
         Event event = getEventOrThrow(eventId);
         if (event.getState() != EventState.PENDING)
-            throw new ForbiddenException(
+            throw new ForbiddenOperationException(
                     "Only an event in PENDING state could be canceled",
                     String.format("Event with id %d in %s state", eventId, event.getState().toString())
                     );

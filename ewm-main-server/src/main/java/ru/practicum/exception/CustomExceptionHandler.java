@@ -16,8 +16,16 @@ public class CustomExceptionHandler {
     @ExceptionHandler(ConflictException.class)
     public ApiError handleConflict(ConflictException ex) {
         log.info("Conflict exception has occurred. Message: {}", ex.getMessage());
-        return new ApiError(ex.getMessage(), ex.getReason(), HttpStatus.CONFLICT.getReasonPhrase().toUpperCase());
+        return new ApiError(ex.getMessage(), ex.getReason(), "CONFLICT");
     }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenOperationException.class)
+    public ApiError handleForbiddenOperationException(ForbiddenOperationException ex) {
+        log.info("Forbidden operation detected. Message: {}", ex.getMessage());
+        return new ApiError(ex.getMessage(), ex.getReason(), "FORBIDDEN");
+    }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
@@ -25,7 +33,7 @@ public class CustomExceptionHandler {
             MethodArgumentNotValidException.class,
             ValidationException.class
     })
-    public ApiError handleConstraintViolation(Exception ex) {
+    public ApiError handleValidationException(Exception ex) {
         log.info("Validation exception has occurred. Message: {}", ex.getMessage());
         return new ApiError(
                 ex.getMessage(),
