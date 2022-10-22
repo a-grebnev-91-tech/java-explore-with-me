@@ -20,8 +20,6 @@ public class PrivateRequestController {
 
     //TODO
     //если для события лимит заявок равен 0 или отключена пре-модерация заявок, то подтверждение заявок не требуется
-    //нельзя подтвердить заявку, если уже достигнут лимит по заявкам на данное событие
-    //если при подтверждении данной заявки, лимит заявок для события исчерпан, то все неподтверждённые заявки необходимо отклонить
     @PatchMapping("/events/{eventId}/requests/{reqId}/confirm")
     public ParticipationRequestDto confirmRequest(
             @PathVariable("userId") @Positive long userId,

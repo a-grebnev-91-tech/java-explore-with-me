@@ -1,13 +1,10 @@
-package ru.practicum.mapper.event;
+package ru.practicum.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.entity.Event;
-import ru.practicum.mapper.category.CategoryMapper;
-import ru.practicum.mapper.category.CategoryReferenceMapper;
-import ru.practicum.mapper.user.UserReferenceMapper;
 
 @Mapper(componentModel = "spring",
         uses = {UserReferenceMapper.class, CategoryMapper.class, CategoryReferenceMapper.class}

@@ -1,4 +1,4 @@
-package ru.practicum.mapper.user;
+package ru.practicum.mapper;
 
 import org.mapstruct.Mapper;
 import ru.practicum.dto.user.NewUserRequest;

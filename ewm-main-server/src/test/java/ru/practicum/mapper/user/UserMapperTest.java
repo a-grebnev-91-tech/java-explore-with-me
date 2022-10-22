@@ -6,6 +6,7 @@ import org.mapstruct.factory.Mappers;
 import ru.practicum.dto.user.NewUserRequest;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.entity.User;
+import ru.practicum.mapper.UserMapper;
 
 import java.util.List;
 

@@ -8,16 +8,14 @@ import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdateEventRequest;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.entity.Event;
-import ru.practicum.entity.ParticipationRequest;
-import ru.practicum.entity.User;
 import ru.practicum.exception.ForbiddenOperationException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.mapper.event.EventMapper;
+import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.EventState;
-import ru.practicum.model.RequestStatus;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.RequestRepository;
 import ru.practicum.repository.UserRepository;
+import ru.practicum.util.OffsetPageable;
 
 import java.util.List;
 
@@ -49,6 +47,9 @@ public class EventService {
     }
 
     public List<EventShortDto> findByInitiator(long userId, int from, int size) {
+        checkUserExistingOrThrow(userId);
+        OffsetPageable pageable = OffsetPageable.of(from, size);
+
         return null;
     }
 

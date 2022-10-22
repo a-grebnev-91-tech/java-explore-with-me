@@ -13,7 +13,7 @@ import ru.practicum.dto.user.NewUserRequest;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.entity.User;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.mapper.user.UserMapper;
+import ru.practicum.mapper.UserMapper;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.OffsetPageable;
 
