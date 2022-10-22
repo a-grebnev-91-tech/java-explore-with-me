@@ -3,13 +3,18 @@ package ru.practicum.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.dto.event.EventFullDto;
+import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.entity.Event;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring",
         uses = {UserReferenceMapper.class, CategoryMapper.class, CategoryReferenceMapper.class}
 )
 public interface EventMapper {
+    List<EventShortDto> batchModelToShortDto(List<Event> entities);
+
     @Mapping(source = "userId", target = "initiator")
     @Mapping(source = "event.category", target = "category")
     @Mapping(source = "location.lat", target = "lat")
@@ -18,5 +23,5 @@ public interface EventMapper {
 
     @Mapping(source = "lat", target = "location.lat")
     @Mapping(source = "lon", target = "location.lon")
-    EventFullDto modelToFullDto(Event entity);
+    EventFullDto entityToFullDto(Event entity);
 }

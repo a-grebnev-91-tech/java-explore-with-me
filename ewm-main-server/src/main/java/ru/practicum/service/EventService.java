@@ -31,7 +31,7 @@ public class EventService {
         checkUserExistingOrThrow(userId);
         Event entity = mapper.dtoToEntity(event, userId);
         entity = eventRepo.save(entity);
-        return mapper.modelToFullDto(entity);
+        return mapper.entityToFullDto(entity);
     }
 
     public EventFullDto cancelById(long userId, long eventId) {
@@ -43,18 +43,26 @@ public class EventService {
                     String.format("Event with id %d in %s state", eventId, event.getState().toString())
             );
         event.setState(EventState.CANCELED);
-        return mapper.modelToFullDto(event);
+        return mapper.entityToFullDto(event);
     }
 
     public List<EventShortDto> findByInitiator(long userId, int from, int size) {
         checkUserExistingOrThrow(userId);
         OffsetPageable pageable = OffsetPageable.of(from, size);
-
-        return null;
+        return mapper.batchModelToShortDto(eventRepo.findByInitiatorId(userId, pageable));
     }
 
     public EventFullDto findById(long userId, long eventId) {
-        return null;
+        Event event = getEventOrThrow(eventId);
+        if (event.getInitiator().getId() != userId) {
+            checkUserExistingOrThrow(userId);
+            throw new ForbiddenOperationException(
+                    "Only initiator of event could receive full information",
+                    String.format("User with id %d isn't initiator of event with id %d", userId, eventId)
+            );
+        } else {
+            return mapper.entityToFullDto(event);
+        }
     }
 
     public EventFullDto updateByInitiator(long userId, UpdateEventRequest dto) {
