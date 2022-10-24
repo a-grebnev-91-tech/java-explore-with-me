@@ -27,6 +27,15 @@ public class PrivateRequestController {
         return service.addRequest(userId, eventId);
     }
 
+    @PatchMapping("/requests/{requestId}/cancel")
+    public ParticipationRequestDto cancelRequest(
+            @PathVariable("userId") @Positive long userId,
+            @PathVariable("requestId") @Positive long requestId
+    ) {
+        log.info("User with ID {} attempt to cancel request with ID {}", userId, requestId);
+        return service.cancelRequest(userId, requestId);
+    }
+
     @PatchMapping("/events/{eventId}/requests/{reqId}/confirm")
     public ParticipationRequestDto confirmRequest(
             @PathVariable("userId") @Positive long userId,

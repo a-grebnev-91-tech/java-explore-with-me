@@ -34,9 +34,25 @@ public class RequestService {
         checkIsNotInitiatorOrThrow(event, userId);
         checkIsPublishedOrThrow(event, eventId);
         checkIsFullyLoadOrThrow(event);
-        checkRequestIsNewOrThrow(userId, eventId);
+        checkRequestIsNotExistOrThrow(userId, eventId);
         ParticipationRequest request = createRequest(event, user);
         return mapper.entityToDto(requestRepo.save(request));
+    }
+
+    public ParticipationRequestDto cancelRequest(long userId, long requestId) {
+        ParticipationRequest request = getRequestOrThrow(requestId);
+        checkUserIsRequesterOrThrow(request, userId);
+        Event event = request.getEvent();
+        switch (request.getStatus()) {
+            case CONFIRMED:
+                long requestsCount = event.getConfirmedRequests();
+                requestsCount--;
+                event.setConfirmedRequests(requestsCount);
+            case PENDING:
+                request.setStatus(RequestStatus.CANCELED);
+                break;
+        }
+        return mapper.entityToDto(request);
     }
 
     public ParticipationRequestDto confirmRequest(long userId, long eventId, long reqId) {
@@ -108,7 +124,7 @@ public class RequestService {
         }
     }
 
-    private void checkRequestIsNewOrThrow(long userId, long eventId) {
+    private void checkRequestIsNotExistOrThrow(long userId, long eventId) {
         Optional<ParticipationRequest> existingRequest = requestRepo.findByEventIdAndRequesterId(eventId, userId);
         if (existingRequest.isPresent())
             throw new ForbiddenOperationException(
@@ -138,6 +154,16 @@ public class RequestService {
     private void checkUserExistingOrThrow(long userId) {
         if (!userRepo.existsById(userId))
             throw new NotFoundException("User not found", String.format("User with id %d isn't exist", userId));
+    }
+
+    private void checkUserIsRequesterOrThrow(ParticipationRequest request, long userId) {
+        if (request.getRequester().getId() != userId) {
+            checkUserExistingOrThrow(userId);
+            throw new ForbiddenOperationException(
+                    "Access denied",
+                    String.format("User with id %d hasn't access to request with id %d", userId, request.getId())
+            );
+        }
     }
 
     private ParticipationRequest confirm(ParticipationRequest request) {
