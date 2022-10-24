@@ -10,12 +10,14 @@ import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.entity.Event;
 import ru.practicum.exception.ForbiddenOperationException;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.PatchException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.EventState;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.RequestRepository;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.OffsetPageable;
+import ru.practicum.util.Patcher;
 
 import java.util.List;
 
@@ -35,8 +37,8 @@ public class EventService {
     }
 
     public EventFullDto cancelById(long userId, long eventId) {
-        checkUserExistingOrThrow(userId);
         Event event = getEventOrThrow(eventId);
+        checkInitiatorOrThrow(event, userId);
         if (event.getState() != EventState.PENDING)
             throw new ForbiddenOperationException(
                     "Only an event in PENDING state could be canceled",
@@ -54,19 +56,33 @@ public class EventService {
 
     public EventFullDto findById(long userId, long eventId) {
         Event event = getEventOrThrow(eventId);
-        if (event.getInitiator().getId() != userId) {
-            checkUserExistingOrThrow(userId);
-            throw new ForbiddenOperationException(
-                    "Only initiator of event could receive full information",
-                    String.format("User with id %d isn't initiator of event with id %d", userId, eventId)
-            );
-        } else {
-            return mapper.entityToFullDto(event);
-        }
+        checkInitiatorOrThrow(event, userId);
+        return mapper.entityToFullDto(event);
     }
 
     public EventFullDto updateByInitiator(long userId, UpdateEventRequest dto) {
-        return null;
+        Event originalEvent = getEventOrThrow(dto.getEventId());
+        checkInitiatorOrThrow(originalEvent, userId);
+        switch (originalEvent.getState()) {
+            case CANCELED:
+                originalEvent.setState(EventState.PENDING);
+                break;
+            case PUBLISHED:
+                throw new ForbiddenOperationException(
+                        "It's not allowed to update an event in state PUBLISHED",
+                        String.format("Event with id %d in %s state",
+                                originalEvent.getId(), originalEvent.getState().toString()
+                        )
+                );
+        }
+        if (Patcher.patch(originalEvent, dto)) {
+            return mapper.entityToFullDto(originalEvent);
+        } else {
+            throw new PatchException(
+                    "Error occurred",
+                    String.format("Patch %s couldn't be applied on %s", dto, originalEvent)
+            );
+        }
     }
 
     public List<ParticipationRequestDto> findParticipationRequests(long userId, long eventId) {
@@ -76,6 +92,16 @@ public class EventService {
     private void checkUserExistingOrThrow(long userId) {
         if (!userRepo.existsById(userId))
             throw new NotFoundException("User not found", String.format("User with id %d isn't exist", userId));
+    }
+
+    private void checkInitiatorOrThrow(Event event, long userId) {
+        if (event.getInitiator().getId() != userId) {
+            checkUserExistingOrThrow(userId);
+            throw new ForbiddenOperationException(
+                    "Only the initiator has access to this operation",
+                    String.format("User with id %d isn't initiator of event with id %d", userId, event.getId())
+            );
+        }
     }
 
     private Event getEventOrThrow(long eventId) {
