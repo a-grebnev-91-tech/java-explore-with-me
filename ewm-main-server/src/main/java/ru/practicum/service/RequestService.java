@@ -1,7 +1,9 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.entity.Event;
 import ru.practicum.entity.ParticipationRequest;
@@ -20,7 +22,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class RequestService {
     private final RequestRepository requestRepo;
@@ -36,6 +40,7 @@ public class RequestService {
         checkIsFullyLoadOrThrow(event);
         checkRequestIsNotExistOrThrow(userId, eventId);
         ParticipationRequest request = createRequest(event, user);
+        log.info("Create request for event with ID {} from user with ID {}", eventId, userId);
         return mapper.entityToDto(requestRepo.save(request));
     }
 
@@ -52,29 +57,34 @@ public class RequestService {
                 request.setStatus(RequestStatus.CANCELED);
                 break;
         }
+        log.info("User with ID {} canceled his request with ID {}", userId, requestId);
         return mapper.entityToDto(request);
     }
 
     public ParticipationRequestDto confirmRequest(long userId, long eventId, long reqId) {
         ParticipationRequest request = getRequestOrThrow(reqId);
         checkRequestIsUpdatableOrThrow(request, userId, eventId);
+        log.info("Initiator with ID {} confirmed request with ID {} for event with ID {}", userId, reqId, eventId);
         return mapper.entityToDto(confirm(request));
     }
 
     public List<ParticipationRequestDto> findRequestsByEvent(long userId, long eventId) {
         Event event = getEventOrThrow(eventId);
         checkIsInitiatorOrThrow(event, userId);
+        log.info("Initiator with ID {} get all requests for event with ID {} ", userId, eventId);
         return mapper.batchEntitiesToDto(requestRepo.findAllByEventId(eventId));
     }
 
     public List<ParticipationRequestDto> findRequestsByUser(long userId) {
         checkUserExistingOrThrow(userId);
+        log.info("User with ID {} received all his requests", userId);
         return mapper.batchEntitiesToDto(requestRepo.findAllByRequesterId(userId));
     }
 
     public ParticipationRequestDto rejectRequest(long userId, long eventId, long reqId) {
         ParticipationRequest request = getRequestOrThrow(reqId);
         checkRequestIsUpdatableOrThrow(request, userId, eventId);
+        log.info("Initiator with ID {} rejected request with ID {} for event with ID {}", userId, reqId, eventId);
         return mapper.entityToDto(reject(request));
     }
 
