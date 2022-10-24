@@ -26,4 +26,14 @@ public class ParticipationRequest {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private RequestStatus status;
+
+    public ParticipationRequest() {
+    }
+
+    public ParticipationRequest(Event event, User requester, LocalDateTime created, RequestStatus status) {
+        this.event = event;
+        this.requester = requester;
+        this.created = created;
+        this.status = status;
+    }
 }
