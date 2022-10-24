@@ -33,7 +33,6 @@ public class PrivateEventController {
             @PathVariable("eventId") @Positive long eventId
     ) {
         log.info("User with ID {} attempt to cancel his event with ID {}", userId, eventId);
-        //TODO cancel only PENDING
         return service.cancelById(userId, eventId);
     }
 
@@ -54,15 +53,6 @@ public class PrivateEventController {
     ) {
         log.info("User with id {} attempt to get his events", userId);
         return service.findByInitiator(userId, from, size);
-    }
-
-    @GetMapping("/{eventId}/requests")
-    public List<ParticipationRequestDto> findParticipationRequests(
-            @PathVariable("userId") @Positive long userId,
-            @PathVariable("eventId") @Positive long eventId
-    ) {
-        log.info("User with ID {} attempt to get his participation requests on event with ID {}", userId, eventId);
-        return service.findParticipationRequests(userId, eventId);
     }
 
     @PatchMapping

@@ -2,14 +2,12 @@ package ru.practicum.controller.priv;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.service.RequestService;
 
 import javax.validation.constraints.Positive;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -28,6 +26,15 @@ public class PrivateRequestController {
     ) {
         log.info("User with ID {} attempt to reject request with ID {} for event with ID {}", userId, eventId, reqId);
         return service.confirmRequest(userId, eventId, reqId);
+    }
+
+    @GetMapping("/events/{eventId}/requests")
+    public List<ParticipationRequestDto> findParticipationRequests(
+            @PathVariable("userId") @Positive long userId,
+            @PathVariable("eventId") @Positive long eventId
+    ) {
+        log.info("User with ID {} attempt to get his participation requests on event with ID {}", userId, eventId);
+        return service.findParticipationRequests(userId, eventId);
     }
 
     @PatchMapping("/events/{eventId}/requests/{reqId}/reject")

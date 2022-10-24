@@ -75,7 +75,7 @@ public class EventService {
                         )
                 );
         }
-        if (Patcher.patch(originalEvent, dto)) {
+        if (Patcher.patch(originalEvent, mapper.updateDtoToModel(dto))) {
             return mapper.entityToFullDto(originalEvent);
         } else {
             throw new PatchException(
@@ -83,10 +83,6 @@ public class EventService {
                     String.format("Patch %s couldn't be applied on %s", dto, originalEvent)
             );
         }
-    }
-
-    public List<ParticipationRequestDto> findParticipationRequests(long userId, long eventId) {
-        return null;
     }
 
     private void checkUserExistingOrThrow(long userId) {

@@ -5,7 +5,9 @@ import org.mapstruct.Mapping;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
+import ru.practicum.dto.event.UpdateEventRequest;
 import ru.practicum.entity.Event;
+import ru.practicum.model.UpdateEvent;
 
 import java.util.List;
 
@@ -24,4 +26,6 @@ public interface EventMapper {
     @Mapping(source = "lat", target = "location.lat")
     @Mapping(source = "lon", target = "location.lon")
     EventFullDto entityToFullDto(Event entity);
+
+    UpdateEvent updateDtoToModel(UpdateEventRequest dto);
 }

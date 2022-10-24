@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import ru.practicum.validation.EventDateInFuture;
+import ru.practicum.validation.ExistingCategory;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -16,6 +17,7 @@ import static ru.practicum.util.Constants.DATE_TIME_FORMAT_STRING;
 public class UpdateEventRequest {
     @Size(min = 20, max = 2000)
     private String annotation;
+    @ExistingCategory
     private Long category;
     @Size(min = 20, max = 7000)
     private String description;
