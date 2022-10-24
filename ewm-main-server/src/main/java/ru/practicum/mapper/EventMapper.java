@@ -19,8 +19,8 @@ public interface EventMapper {
 
     @Mapping(source = "userId", target = "initiator")
     @Mapping(source = "event.category", target = "category")
-    @Mapping(source = "location.lat", target = "lat")
-    @Mapping(source = "location.lon", target = "lon")
+    @Mapping(source = "event.location.lat", target = "lat")
+    @Mapping(source = "event.location.lon", target = "lon")
     Event dtoToEntity(NewEventDto event, long userId);
 
     @Mapping(source = "lat", target = "location.lat")

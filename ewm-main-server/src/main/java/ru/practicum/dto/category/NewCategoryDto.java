@@ -6,8 +6,7 @@ import ru.practicum.validation.UniqueCategoryName;
 
 @Getter
 @Setter
-public class CategoryDto {
-    private long id;
+public class NewCategoryDto {
     @UniqueCategoryName
     private String name;
 }

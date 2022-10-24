@@ -9,7 +9,7 @@ import javax.validation.ConstraintValidatorContext;
 
 @Component
 @RequiredArgsConstructor
-public class CategoryValidator implements ConstraintValidator<ExistingCategory, Long> {
+public class CategoryIdValidator implements ConstraintValidator<ExistingCategory, Long> {
     private final CategoryRepository repository;
 
     @Override

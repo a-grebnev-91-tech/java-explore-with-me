@@ -6,14 +6,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.*;
-import static java.lang.annotation.ElementType.TYPE_USE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({METHOD, FIELD, ANNOTATION_TYPE, TYPE_USE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = CategoryIdValidator.class)
-public @interface ExistingCategory {
-    String message() default "Category id should exist";
+@Constraint(validatedBy = CategoryNameValidator.class)
+public @interface UniqueCategoryName {
+    String message() default "A category with such name already exist";
 
     Class<?>[] groups() default {};
 
