@@ -1,9 +1,12 @@
 package ru.practicum.mapper;
 
 import org.mapstruct.Mapper;
+import org.springframework.data.domain.Page;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.category.NewCategoryDto;
 import ru.practicum.entity.Category;
+
+import java.util.List;
 
 @Mapper
 public interface CategoryMapper {
@@ -12,4 +15,6 @@ public interface CategoryMapper {
     Category dtoToEntity(CategoryDto dto);
 
     CategoryDto entityToDto(Category entity);
+
+    List<CategoryDto> batchEntitiesToDto(List<Category> entities);
 }

@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.category.NewCategoryDto;
@@ -11,6 +12,9 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.CategoryMapper;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.EventRepository;
+import ru.practicum.util.OffsetPageable;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -24,6 +28,17 @@ public class CategoryService {
         Category category = mapper.dtoToEntity(dto);
         category = categoryRepo.save(category);
         log.info("Category with name {} created", category.getName());
+        return mapper.entityToDto(category);
+    }
+
+    public List<CategoryDto> findAll(int from, int size) {
+        Pageable pageable = OffsetPageable.of(from, size);
+        return mapper.batchEntitiesToDto(categoryRepo.findAll(pageable).getContent());
+    }
+
+    public CategoryDto findById(long id) {
+        Category category = getCategoryOrThrow(id);
+        log.info("Getting category with ID {}", id);
         return mapper.entityToDto(category);
     }
 
