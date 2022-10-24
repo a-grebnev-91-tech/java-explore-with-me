@@ -1,12 +1,13 @@
 package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.dto.event.NewEventDto;
 import ru.practicum.dto.event.UpdateEventRequest;
-import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.entity.Event;
 import ru.practicum.exception.ForbiddenOperationException;
 import ru.practicum.exception.NotFoundException;
@@ -14,25 +15,26 @@ import ru.practicum.exception.PatchException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.EventState;
 import ru.practicum.repository.EventRepository;
-import ru.practicum.repository.RequestRepository;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.OffsetPageable;
 import ru.practicum.util.Patcher;
 
 import java.util.List;
 
+@Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class EventService {
     private final EventRepository eventRepo;
     private final UserRepository userRepo;
-    private final RequestRepository requestRepo;
     private final EventMapper mapper;
 
     public EventFullDto addEvent(NewEventDto event, long userId) {
         checkUserExistingOrThrow(userId);
         Event entity = mapper.dtoToEntity(event, userId);
         entity = eventRepo.save(entity);
+        log.info("User with ID {} create event with ID {}", userId, entity.getId());
         return mapper.entityToFullDto(entity);
     }
 
@@ -45,18 +47,21 @@ public class EventService {
                     String.format("Event with id %d in %s state", eventId, event.getState().toString())
             );
         event.setState(EventState.CANCELED);
+        log.info("Initiator with ID {} canceled event with ID {}", userId, eventId);
         return mapper.entityToFullDto(event);
     }
 
     public List<EventShortDto> findByInitiator(long userId, int from, int size) {
         checkUserExistingOrThrow(userId);
         OffsetPageable pageable = OffsetPageable.of(from, size);
+        log.info("Initiator with ID {} received all his events", userId);
         return mapper.batchModelToShortDto(eventRepo.findByInitiatorId(userId, pageable));
     }
 
     public EventFullDto findById(long userId, long eventId) {
         Event event = getEventOrThrow(eventId);
         checkInitiatorOrThrow(event, userId);
+        log.info("Initiator with ID {} received event with ID {}", userId, eventId);
         return mapper.entityToFullDto(event);
     }
 
@@ -76,6 +81,7 @@ public class EventService {
                 );
         }
         if (Patcher.patch(originalEvent, mapper.updateDtoToModel(dto))) {
+            log.info("Initiator with ID {} update event with ID", userId, dto.getEventId());
             return mapper.entityToFullDto(originalEvent);
         } else {
             throw new PatchException(
