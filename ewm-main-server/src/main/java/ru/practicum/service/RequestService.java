@@ -216,7 +216,9 @@ public class RequestService {
     }
 
     private boolean isEventFullyLoad(Event event) {
-        return event.getConfirmedRequests() >= event.getParticipantLimit();
+        long limit = event.getParticipantLimit();
+        if (limit == 0) return true;
+        else return event.getConfirmedRequests() >= limit;
     }
 
     private boolean isInitiator(Event event, long userId) {

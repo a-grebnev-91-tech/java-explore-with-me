@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.*;
-import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.service.EventService;
 
 import javax.validation.Valid;

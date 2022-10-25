@@ -21,6 +21,7 @@ import ru.practicum.util.Patcher;
 
 import java.util.List;
 
+//TODO check pre-moderation of requests
 @Slf4j
 @Service
 @Transactional
@@ -81,7 +82,7 @@ public class EventService {
                 );
         }
         if (Patcher.patch(originalEvent, mapper.updateDtoToModel(dto))) {
-            log.info("Initiator with ID {} update event with ID", userId, dto.getEventId());
+            log.info("Initiator with ID {} update event with ID {}", userId, dto.getEventId());
             return mapper.entityToFullDto(originalEvent);
         } else {
             throw new PatchException(

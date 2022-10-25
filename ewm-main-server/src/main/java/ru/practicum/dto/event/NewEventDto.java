@@ -29,10 +29,10 @@ public class NewEventDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_STRING)
     private LocalDateTime eventDate;
     @ExistingCategory
-    private long category;
-    private Boolean paid;
-    private Boolean requestModeration;
-    private int participantLimit;
+    private Long category;
+    private Boolean paid = false;
+    private Boolean requestModeration = true;
+    private Integer participantLimit = 0;
     @NotNull
     private Location location;
 }

@@ -23,7 +23,7 @@ public class Event {
     @Column(name = "confirmed_requests")
     private long confirmedRequests;
     @Column(name = "created_on", nullable = false)
-    private LocalDateTime createdOn;
+    private LocalDateTime createdOn = LocalDateTime.now();
     @Column(name = "description", nullable = false)
     private String description;
     @Column(name = "event_date", nullable = false)
@@ -38,16 +38,16 @@ public class Event {
     @Column(name = "paid", nullable = false)
     private Boolean paid;
     @Column(name = "participant_limit")
-    private int participantLimit;
+    private Integer participantLimit;
     @Column(name = "published_on")
     private LocalDateTime publishedOn;
     @Column(name = "request_moderation", nullable = false)
     private Boolean requestModeration;
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
-    private EventState state;
+    private EventState state = EventState.PENDING;
     @Column(name = "title", nullable = false)
     private String title;
     @Column(name = "views")
-    private long views;
+    private Long views = 0L;
 }
