@@ -26,9 +26,9 @@ public class AdminCategoryController {
     }
 
     @DeleteMapping("/{catId}")
-    public void removeCategory(@PathVariable @ExistingCategory long catId) {
+    public void deleteCategory(@PathVariable @ExistingCategory long catId) {
         log.info("Attempt to remove category with ID {}", catId);
-        service.remove(catId);
+        service.delete(catId);
     }
 
     @PatchMapping

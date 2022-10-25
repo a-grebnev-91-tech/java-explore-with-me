@@ -31,18 +31,7 @@ public class CategoryService {
         return mapper.entityToDto(category);
     }
 
-    public List<CategoryDto> findAll(int from, int size) {
-        Pageable pageable = OffsetPageable.of(from, size);
-        return mapper.batchEntitiesToDto(categoryRepo.findAll(pageable).getContent());
-    }
-
-    public CategoryDto findById(long id) {
-        Category category = getCategoryOrThrow(id);
-        log.info("Getting category with ID {}", id);
-        return mapper.entityToDto(category);
-    }
-
-    public void remove(long catId) {
+    public void delete(long catId) {
         if (eventRepo.existsByCategoryId(catId)) {
             throw new ForbiddenOperationException(
                     "Deleting a category is forbidden",
@@ -52,6 +41,17 @@ public class CategoryService {
             categoryRepo.deleteById(catId);
             log.info("Category with ID {} removed", catId);
         }
+    }
+
+    public List<CategoryDto> findAll(int from, int size) {
+        Pageable pageable = OffsetPageable.of(from, size);
+        return mapper.batchEntitiesToDto(categoryRepo.findAll(pageable).getContent());
+    }
+
+    public CategoryDto findById(long id) {
+        Category category = getCategoryOrThrow(id);
+        log.info("Getting category with ID {}", id);
+        return mapper.entityToDto(category);
     }
 
     public CategoryDto update(CategoryDto dto) {
