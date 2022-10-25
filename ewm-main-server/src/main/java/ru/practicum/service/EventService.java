@@ -17,6 +17,7 @@ import ru.practicum.model.EventState;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.OffsetPageable;
+import ru.practicum.util.ParamObject;
 import ru.practicum.util.Patcher;
 
 import java.util.List;
@@ -52,6 +53,24 @@ public class EventService {
         return mapper.entityToFullDto(event);
     }
 
+    //TODO add statistics
+    public List<EventShortDto> findAll(ParamObject paramObj) {
+//это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
+//текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
+//если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
+//информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
+//информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
+        throw new RuntimeException("Not impl");
+    }
+
+    //TODO add statistics
+    public EventFullDto findById(long id) {
+//        событие должно быть опубликовано
+//        информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов
+//        информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
+        throw new RuntimeException("not impl");
+    }
+
     public List<EventShortDto> findByInitiator(long userId, int from, int size) {
         checkUserExistingOrThrow(userId);
         OffsetPageable pageable = OffsetPageable.of(from, size);
@@ -59,10 +78,10 @@ public class EventService {
         return mapper.batchModelToShortDto(eventRepo.findByInitiatorId(userId, pageable));
     }
 
-    public EventFullDto findById(long userId, long eventId) {
+    public EventFullDto findByIdForInitiator(long initiatorId, long eventId) {
         Event event = getEventOrThrow(eventId);
-        checkInitiatorOrThrow(event, userId);
-        log.info("Initiator with ID {} received event with ID {}", userId, eventId);
+        checkInitiatorOrThrow(event, initiatorId);
+        log.info("Initiator with ID {} received event with ID {}", initiatorId, eventId);
         return mapper.entityToFullDto(event);
     }
 

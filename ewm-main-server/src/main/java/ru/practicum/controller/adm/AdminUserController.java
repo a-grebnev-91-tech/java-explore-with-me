@@ -13,6 +13,9 @@ import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+import static ru.practicum.util.Constants.DEFAULT_FROM_VALUE;
+import static ru.practicum.util.Constants.DEFAULT_SIZE_VALUE;
+
 @Slf4j
 @Validated
 @RestController
@@ -36,8 +39,8 @@ public class AdminUserController {
     @GetMapping
     public List<UserDto> findAll(
             @RequestParam(value = "ids", required = false) List<Long> ids,
-            @RequestParam(value = "from", defaultValue = "0") @PositiveOrZero int from,
-            @RequestParam(value = "size", defaultValue = "10") @Positive int size
+            @RequestParam(value = "from", defaultValue = DEFAULT_FROM_VALUE) @PositiveOrZero int from,
+            @RequestParam(value = "size", defaultValue = DEFAULT_SIZE_VALUE) @Positive int size
     ) {
         if (ids == null) {
             log.info("Attempt to get all users");

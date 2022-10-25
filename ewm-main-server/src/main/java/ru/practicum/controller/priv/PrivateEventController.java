@@ -41,7 +41,7 @@ public class PrivateEventController {
             @PathVariable("eventId") @Positive long eventId
     ) {
         log.info("User with ID {} attempt to get his event with ID {}", userId, eventId);
-        return service.findById(userId, eventId);
+        return service.findByIdForInitiator(userId, eventId);
     }
 
     @GetMapping
