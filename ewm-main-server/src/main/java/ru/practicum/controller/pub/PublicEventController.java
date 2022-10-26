@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.model.EventOrderBy;
 import ru.practicum.service.EventService;
 import ru.practicum.util.ParamObject;
 
@@ -27,23 +28,22 @@ public class PublicEventController {
     @GetMapping
     public List<EventShortDto> findAll(
             @RequestParam(value = "text", required = false) String text,
-            @RequestParam(value = "categories", required = false) List<Integer> categories,
+            @RequestParam(value = "categories", required = false) List<Long> categories,
             @RequestParam(value = "paid", required = false) Boolean paid,
             @RequestParam(value = "rangeStart", required = false) @DateTimeFormat(pattern = DATE_TIME_FORMAT_STRING)
             LocalDateTime rangeStart,
             @RequestParam(value = "rangeEnd", required = false) @DateTimeFormat(pattern = DATE_TIME_FORMAT_STRING)
             LocalDateTime rangeEnd,
             @RequestParam(value = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
-            @RequestParam(value = "sort", required = false) String sortOrder,
-            @RequestParam(value = "orderBy", required = false) String orderBy,
+            @RequestParam(value = "orderBy", required = false) EventOrderBy orderBy,
             @RequestParam(value = "from", defaultValue = DEFAULT_FROM_VALUE) int from,
             @RequestParam(value = "size", defaultValue = DEFAULT_SIZE_VALUE) int size
     ) {
         log.info("Requested all events by parameters: text - {}, categories - {}, paid - {}, rangeStart - {}, " +
                 "rangeEnd - {}, onlyAvailable - {}", text, categories, paid, rangeStart, rangeEnd, onlyAvailable);
         ParamObject paramObj = ParamObject.newBuilder().withText(text).withCategories(categories).withPaid(paid)
-                .withRangeStart(rangeStart).withRangeEnd(rangeEnd).withOnlyAvailable(onlyAvailable).sortOrder(sortOrder)
-                .orderBy(orderBy).from(from).size(size).build();
+                .withRangeStart(rangeStart).withRangeEnd(rangeEnd).withOnlyAvailable(onlyAvailable).orderBy(orderBy)
+                .from(from).size(size).build();
         return service.findAll(paramObj);
     }
 

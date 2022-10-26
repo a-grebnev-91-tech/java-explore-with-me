@@ -60,7 +60,9 @@ public class EventService {
 //если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
 //информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
 //информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
-        throw new RuntimeException("Not impl");
+//        throw new RuntimeException("Not impl");
+
+        return mapper.batchModelToShortDto(eventRepo.findAllByQueryDsl(paramObj));
     }
 
     //TODO add statistics

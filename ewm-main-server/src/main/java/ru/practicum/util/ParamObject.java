@@ -3,10 +3,8 @@ package ru.practicum.util;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
-import ru.practicum.exception.ValidationException;
+import ru.practicum.model.EventOrderBy;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,21 +15,24 @@ import static ru.practicum.util.Constants.DEFAULT_SIZE_VALUE;
 @Getter
 @Setter
 @AllArgsConstructor
+//TODO rename
 public class ParamObject {
     private final String text;
-    private final List<Integer> categories;
+    private final List<Long> categories;
     private final Boolean paid;
     private final LocalDateTime rangeStart;
     private final LocalDateTime rangeEnd;
     private final Boolean onlyAvailable;
-    private final Pageable pageable;
-
-    public boolean hasText() {
-        return text != null && !text.isBlank();
-    }
+    private final EventOrderBy orderBy;
+    private final int offset;
+    private final int size;
 
     public boolean hasCategories() {
         return categories != null && !categories.isEmpty();
+    }
+
+    public boolean hasOnlyAvailable() {
+        return onlyAvailable != null;
     }
 
     public boolean hasPaid() {
@@ -46,8 +47,12 @@ public class ParamObject {
         return rangeEnd != null;
     }
 
-    public boolean hasOnlyAvailable() {
-        return onlyAvailable != null;
+    public boolean hasOrderBy() {
+        return orderBy != null;
+    }
+
+    public boolean hasText() {
+        return text != null && !text.isBlank();
     }
 
     private ParamObject(ParamBuilder builder) {
@@ -57,20 +62,10 @@ public class ParamObject {
         this.rangeStart = builder.rangeStart;
         this.rangeEnd = builder.rangeEnd;
         this.onlyAvailable = builder.onlyAvailable;
-        int offset = builder.from == null ? Integer.parseInt(DEFAULT_FROM_VALUE) : builder.from;
-        int size = builder.size == null ? Integer.parseInt(DEFAULT_SIZE_VALUE) : builder.size;
-        if (builder.orderBy == null) {
-            this.pageable = OffsetPageable.of(offset, size);
-        } else {
-            String orderBy = builder.orderBy;
-            Sort sort;
-            if (builder.sortOrder == null) {
-                sort = Sort.by(orderBy);
-            } else {
-                sort = Sort.by(Sort.Direction.valueOf(builder.sortOrder), orderBy);
-            }
-            this.pageable = OffsetPageable.of(offset, size, sort);
-        }
+        this.orderBy = builder.orderBy;
+        this.offset = builder.from == null ? Integer.parseInt(DEFAULT_FROM_VALUE) : builder.from;
+        this.size = builder.size == null ? Integer.parseInt(DEFAULT_SIZE_VALUE) : builder.size;
+
     }
 
     public static ParamBuilder newBuilder() {
@@ -79,13 +74,12 @@ public class ParamObject {
 
     public static final class ParamBuilder {
         private String text;
-        private List<Integer> categories;
+        private List<Long> categories;
         private Boolean paid;
         private LocalDateTime rangeStart;
         private LocalDateTime rangeEnd;
         private Boolean onlyAvailable;
-        private String orderBy;
-        private String sortOrder;
+        private EventOrderBy orderBy;
         private Integer from;
         private Integer size;
 
@@ -97,7 +91,7 @@ public class ParamObject {
             return this;
         }
 
-        public ParamBuilder withCategories(List<Integer> categories) {
+        public ParamBuilder withCategories(List<Long> categories) {
             this.categories = categories == null ? categories : List.copyOf(categories);
             return this;
         }
@@ -132,17 +126,8 @@ public class ParamObject {
             return this;
         }
 
-        public ParamBuilder orderBy(String orderBy) {
-            if (orderBy == null || orderBy.equals("EVENT_DATE") || orderBy.equals("VIEWS")) {
-                this.orderBy = orderBy;
-                return this;
-            } else {
-                throw new ValidationException("Sort by is invalid", "Sort by should be one of {EVENT_DATE, VIEWS}");
-            }
-        }
-
-        public ParamBuilder sortOrder(String sortOrder) {
-            this.sortOrder = sortOrder;
+        public ParamBuilder orderBy(EventOrderBy orderBy) {
+            this.orderBy = orderBy;
             return this;
         }
 
