@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import ru.practicum.exception.ValidationException;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,6 +25,30 @@ public class ParamObject {
     private final LocalDateTime rangeEnd;
     private final Boolean onlyAvailable;
     private final Pageable pageable;
+
+    public boolean hasText() {
+        return text != null && !text.isBlank();
+    }
+
+    public boolean hasCategories() {
+        return categories != null && !categories.isEmpty();
+    }
+
+    public boolean hasPaid() {
+        return paid != null;
+    }
+
+    public boolean hasRangeStart() {
+        return rangeStart != null;
+    }
+
+    public boolean hasRangeEnd() {
+        return rangeEnd != null;
+    }
+
+    public boolean hasOnlyAvailable() {
+        return onlyAvailable != null;
+    }
 
     private ParamObject(ParamBuilder builder) {
         this.text = builder.text;
