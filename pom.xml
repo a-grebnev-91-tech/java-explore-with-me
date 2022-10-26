@@ -25,6 +25,7 @@
         <java.version>11</java.version>
         <org.mapstruct.version>1.5.2.Final</org.mapstruct.version>
         <org.projectlombok.version>1.18.24</org.projectlombok.version>
+        <com.querydsl.version>5.0.0</com.querydsl.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,7 +37,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.junit.vintage</groupId>
