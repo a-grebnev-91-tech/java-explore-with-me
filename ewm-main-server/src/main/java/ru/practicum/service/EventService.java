@@ -54,23 +54,18 @@ public class EventService {
     }
 
     //TODO add statistics
+    //TODO информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
     public List<EventShortDto> findAll(ParamObject paramObj) {
-//это публичный эндпоинт, соответственно в выдаче должны быть только опубликованные события
-//текстовый поиск (по аннотации и подробному описанию) должен быть без учета регистра букв
-//если в запросе не указан диапазон дат [rangeStart-rangeEnd], то нужно выгружать события, которые произойдут позже текущей даты и времени
-//информация о каждом событии должна включать в себя количество просмотров и количество уже одобренных заявок на участие
-//информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
-//        throw new RuntimeException("Not impl");
-
         return mapper.batchModelToShortDto(eventRepo.findAllByQueryDsl(paramObj));
     }
 
     //TODO add statistics
+    //информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
     public EventFullDto findById(long id) {
-//        событие должно быть опубликовано
-//        информация о событии должна включать в себя количество просмотров и количество подтвержденных запросов
-//        информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
-        throw new RuntimeException("not impl");
+        Event event = eventRepo.findByIdAndState(id, EventState.PUBLISHED).orElseThrow(
+                () -> new NotFoundException("Event not found", String.format("Event with id %d isn't exist", id))
+        );
+        return mapper.entityToFullDto(event);
     }
 
     public List<EventShortDto> findByInitiator(long userId, int from, int size) {

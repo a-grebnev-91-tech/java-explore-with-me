@@ -8,12 +8,13 @@ import ru.practicum.util.ParamObject;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static ru.practicum.entity.QEvent.event;
 
 @RequiredArgsConstructor
-public class EventRepositoryCustomImpl implements EventRepositoryCustom {
+public class EventRepositoryQueryDslImpl implements EventRepositoryQueryDsl {
     @PersistenceContext
     private final EntityManager entityManager;
 
@@ -43,6 +44,9 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         }
         if (paramObj.hasRangeEnd()) {
             jpaQuery.where(event.eventDate.before(paramObj.getRangeEnd()));
+        }
+        if (!paramObj.hasRangeStart() && !paramObj.hasRangeEnd()) {
+            jpaQuery.where(event.eventDate.after(LocalDateTime.now()));
         }
     }
 
