@@ -2,10 +2,7 @@ package ru.practicum.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.practicum.dto.event.EventFullDto;
-import ru.practicum.dto.event.EventShortDto;
-import ru.practicum.dto.event.NewEventDto;
-import ru.practicum.dto.event.UpdateEventRequest;
+import ru.practicum.dto.event.*;
 import ru.practicum.entity.Event;
 import ru.practicum.model.UpdateEvent;
 
@@ -29,5 +26,11 @@ public interface EventMapper {
     @Mapping(source = "lon", target = "location.lon")
     EventFullDto entityToFullDto(Event entity);
 
+    @Mapping(source = "dto.category", target = "category")
+    @Mapping(source = "dto.location.lat", target = "lat")
+    @Mapping(source = "dto.location.lon", target = "lon")
+    UpdateEvent updateDtoToModel(AdminUpdateEventRequest dto);
+
+    @Mapping(source = "dto.category", target = "category")
     UpdateEvent updateDtoToModel(UpdateEventRequest dto);
 }

@@ -3,13 +3,9 @@ package ru.practicum.controller.adm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.practicum.dto.event.AdminUpdateEventRequest;
 import ru.practicum.dto.event.EventFullDto;
-import ru.practicum.model.EventOrderBy;
 import ru.practicum.model.EventState;
 import ru.practicum.service.EventService;
 import ru.practicum.util.AdminEventParamObj;
@@ -20,7 +16,6 @@ import java.util.List;
 import static ru.practicum.util.Constants.*;
 
 @Slf4j
-@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/events")
@@ -45,5 +40,20 @@ public class AdminEventController {
                 .withCategories(categories).withRangeStart(rangeStart).withRangeEnd(rangeEnd).from(from).size(size)
                 .build();
         return service.findAll(paramObj);
+    }
+
+    @PatchMapping("/{eventId}/publish")
+    public EventFullDto publishEvent(@PathVariable("eventId") long id) {
+        log.info("Admin attempt to publish event with ID {}", id);
+        return service.publishEvent(id);
+    }
+
+    @PutMapping("/{eventId}")
+    public EventFullDto updateEvent(
+            @PathVariable("eventId") long id,
+            @RequestBody AdminUpdateEventRequest event
+    ) {
+        log.info("Admin attempt to update event with ID {}", id);
+        return service.updateByAdmin(id, event);
     }
 }
