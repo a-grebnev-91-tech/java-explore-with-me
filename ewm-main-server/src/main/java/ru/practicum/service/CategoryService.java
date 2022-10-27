@@ -38,7 +38,8 @@ public class CategoryService {
                     "Allowed to delete only categories without events"
             );
         } else {
-            categoryRepo.deleteById(catId);
+            Category cat = getCategoryOrThrow(catId);
+            categoryRepo.delete(cat);
             log.info("Category with ID {} removed", catId);
         }
     }
