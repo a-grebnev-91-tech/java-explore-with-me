@@ -159,7 +159,7 @@ public class EventService {
                     "Only PENDING events can be published",
                     String.format("Event with ID %d in %s state", event.getId(), event.getState())
             );
-        if (event.getEventDate().isAfter(LocalDateTime.now().minusHours(1)))
+        if (event.getEventDate().isBefore(LocalDateTime.now().plusHours(1)))
             throw new ForbiddenOperationException(
                     "Only events in future could be published",
                     String.format("Before start of the event with ID %d less than hour", event.getId())
