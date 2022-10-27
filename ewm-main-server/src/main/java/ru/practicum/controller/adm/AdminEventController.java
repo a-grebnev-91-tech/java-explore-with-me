@@ -48,6 +48,12 @@ public class AdminEventController {
         return service.publishEvent(id);
     }
 
+    @PatchMapping("/{eventId}/reject")
+    public EventFullDto rejectEvent(@PathVariable("eventId") long id) {
+        log.info("Admin attempt to reject event with ID {}", id);
+        return service.rejectEvent(id);
+    }
+
     @PutMapping("/{eventId}")
     public EventFullDto updateEvent(
             @PathVariable("eventId") long id,
