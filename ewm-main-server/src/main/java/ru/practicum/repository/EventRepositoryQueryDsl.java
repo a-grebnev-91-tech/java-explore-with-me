@@ -1,10 +1,13 @@
 package ru.practicum.repository;
 
 import ru.practicum.entity.Event;
-import ru.practicum.util.ParamObject;
+import ru.practicum.util.AdminEventParamObj;
+import ru.practicum.util.PublicEventParamObj;
 
 import java.util.List;
 
 public interface EventRepositoryQueryDsl {
-    List<Event> findAllByQueryDsl(ParamObject paramObj);
+    List<Event> findAllByPublicParams(PublicEventParamObj paramObj);
+
+    List<Event> findAllByAdminParams(AdminEventParamObj paramObj);
 }

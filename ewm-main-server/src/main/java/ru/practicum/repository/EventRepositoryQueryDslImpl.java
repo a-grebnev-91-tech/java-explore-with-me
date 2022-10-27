@@ -3,8 +3,10 @@ package ru.practicum.repository;
 import com.querydsl.jpa.impl.JPAQuery;
 import lombok.RequiredArgsConstructor;
 import ru.practicum.entity.Event;
+import ru.practicum.model.EventOrderBy;
 import ru.practicum.model.EventState;
-import ru.practicum.util.ParamObject;
+import ru.practicum.util.AdminEventParamObj;
+import ru.practicum.util.PublicEventParamObj;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -19,69 +21,88 @@ public class EventRepositoryQueryDslImpl implements EventRepositoryQueryDsl {
     private final EntityManager entityManager;
 
     @Override
-    public List<Event> findAllByQueryDsl(ParamObject paramObj) {
+    public List<Event> findAllByPublicParams(PublicEventParamObj paramObj) {
         JPAQuery<Event> jpaQuery = new JPAQuery<>(entityManager);
         jpaQuery = jpaQuery.from(event).where(event.state.eq(EventState.PUBLISHED));
-        applyTextFilter(paramObj, jpaQuery);
-        applyCategoriesFilter(paramObj, jpaQuery);
-        applyPaidFilter(paramObj, jpaQuery);
-        applyDateRangeFilter(paramObj, jpaQuery);
-        applyOnlyAvailableFilter(paramObj, jpaQuery);
-        applyOrderByFilter(paramObj, jpaQuery);
+        if (paramObj.hasText())
+            applyTextFilter(paramObj.getText(), jpaQuery);
+        if (paramObj.hasCategories())
+            applyCategoriesFilter(paramObj.getCategories(), jpaQuery);
+        if (paramObj.hasPaid())
+            applyPaidFilter(paramObj.getPaid(), jpaQuery);
+        if (paramObj.hasOnlyAvailable())
+            applyOnlyAvailableFilter(paramObj.getOnlyAvailable(), jpaQuery);
+        if (paramObj.hasOrderBy())
+            applyOrderByFilter(paramObj.getOrderBy(), jpaQuery);
+        applyDateRangeFilter(paramObj.getRangeStart(), paramObj.getRangeEnd(), jpaQuery);
         jpaQuery.offset(paramObj.getOffset()).limit(paramObj.getSize());
         return jpaQuery.fetch();
     }
 
-    private void applyCategoriesFilter(ParamObject paramObj, JPAQuery<Event> jpaQuery) {
-        if (paramObj.hasCategories()) {
-            jpaQuery.where(event.category.id.in(paramObj.getCategories()));
-        }
+    @Override
+    public List<Event> findAllByAdminParams(AdminEventParamObj paramObj) {
+        JPAQuery<Event> jpaQuery = new JPAQuery<>(entityManager);
+        jpaQuery = jpaQuery.from(event);
+        if (paramObj.hasUsers())
+            applyUsersFilter(paramObj.getUsers(), jpaQuery);
+        if (paramObj.hasStates())
+            applyStatesFilter(paramObj.getStates(), jpaQuery);
+        if (paramObj.hasCategories())
+            applyCategoriesFilter(paramObj.getCategories(), jpaQuery);
+        applyDateRangeFilter(paramObj.getRangeStart(), paramObj.getRangeEnd(), jpaQuery);
+        jpaQuery.offset(paramObj.getOffset()).limit(paramObj.getSize());
+        return jpaQuery.fetch();
     }
 
-    private void applyDateRangeFilter(ParamObject paramObj, JPAQuery<Event> jpaQuery) {
-        if (paramObj.hasRangeStart()) {
-            jpaQuery.where(event.eventDate.after(paramObj.getRangeStart()));
+    private void applyCategoriesFilter(List<Long> categories, JPAQuery<Event> jpaQuery) {
+        jpaQuery.where(event.category.id.in(categories));
+    }
+
+    private void applyDateRangeFilter(LocalDateTime rangeStart, LocalDateTime rangeEnd, JPAQuery<Event> jpaQuery) {
+        if (rangeStart != null) {
+            jpaQuery.where(event.eventDate.after(rangeStart);
         }
-        if (paramObj.hasRangeEnd()) {
-            jpaQuery.where(event.eventDate.before(paramObj.getRangeEnd()));
+        if (rangeEnd != null) {
+            jpaQuery.where(event.eventDate.before(rangeEnd));
         }
-        if (!paramObj.hasRangeStart() && !paramObj.hasRangeEnd()) {
+        if (rangeStart == null && rangeEnd == null) {
             jpaQuery.where(event.eventDate.after(LocalDateTime.now()));
         }
     }
 
-    private void applyOrderByFilter(ParamObject paramObj, JPAQuery<Event> jpaQuery) {
-        if (paramObj.hasOrderBy()) {
-            switch (paramObj.getOrderBy()) {
-                case EVENT_DATE:
-                    jpaQuery.orderBy(event.eventDate.desc());
-                    break;
-                case VIEWS:
-                    jpaQuery.orderBy(event.views.desc());
-                    break;
-            }
+    private void applyOrderByFilter(EventOrderBy orderBy, JPAQuery<Event> jpaQuery) {
+        switch (orderBy) {
+            case EVENT_DATE:
+                jpaQuery.orderBy(event.eventDate.desc());
+                break;
+            case VIEWS:
+                jpaQuery.orderBy(event.views.desc());
+                break;
         }
     }
 
-    private void applyOnlyAvailableFilter(ParamObject paramObj, JPAQuery<Event> jpaQuery) {
-        if (paramObj.hasOnlyAvailable()) {
+    private void applyOnlyAvailableFilter(Boolean onlyAvailable, JPAQuery<Event> jpaQuery) {
+        if (onlyAvailable) {
             jpaQuery.where(event.participantLimit.eq(0).or(event.confirmedRequests.lt(event.participantLimit)));
         }
     }
 
-    private void applyPaidFilter(ParamObject paramObj, JPAQuery<Event> jpaQuery) {
-        if (paramObj.hasPaid()) {
-            jpaQuery.where(event.paid.eq(paramObj.getPaid()));
-        }
+    private void applyStatesFilter(List<EventState> states, JPAQuery<Event> jpaQuery) {
+        jpaQuery.where(event.state.in(states));
     }
 
-    private void applyTextFilter(ParamObject paramObj, JPAQuery<Event> jpaQuery) {
-        if (paramObj.hasText()) {
-            String text = paramObj.getText();
-            jpaQuery.where(
-                    event.description.containsIgnoreCase(text)
-                            .or(event.annotation.containsIgnoreCase(text))
-            );
-        }
+    private void applyPaidFilter(Boolean paid, JPAQuery<Event> jpaQuery) {
+        jpaQuery.where(event.paid.eq(paid));
+    }
+
+    private void applyTextFilter(String text, JPAQuery<Event> jpaQuery) {
+        jpaQuery.where(
+                event.description.containsIgnoreCase(text)
+                        .or(event.annotation.containsIgnoreCase(text))
+        );
+    }
+
+    private void applyUsersFilter(List<Long> users, JPAQuery<Event> jpaQuery) {
+        jpaQuery.where(event.initiator.id.in(users));
     }
 }

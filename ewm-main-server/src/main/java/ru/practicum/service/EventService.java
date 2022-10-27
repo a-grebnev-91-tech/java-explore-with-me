@@ -16,8 +16,9 @@ import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.EventState;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.UserRepository;
+import ru.practicum.util.AdminEventParamObj;
 import ru.practicum.util.OffsetPageable;
-import ru.practicum.util.ParamObject;
+import ru.practicum.util.PublicEventParamObj;
 import ru.practicum.util.Patcher;
 
 import java.util.List;
@@ -55,8 +56,12 @@ public class EventService {
 
     //TODO add statistics
     //TODO информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
-    public List<EventShortDto> findAll(ParamObject paramObj) {
-        return mapper.batchModelToShortDto(eventRepo.findAllByQueryDsl(paramObj));
+    public List<EventShortDto> findAll(PublicEventParamObj paramObj) {
+        return mapper.batchModelToShortDto(eventRepo.findAllByPublicParams(paramObj));
+    }
+
+    public List<EventFullDto> findAll(AdminEventParamObj paramObj) {
+        return mapper.batchModelToFullDto(eventRepo.findAllByAdminParams(paramObj));
     }
 
     //TODO add statistics

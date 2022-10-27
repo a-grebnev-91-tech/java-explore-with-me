@@ -9,7 +9,7 @@ import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.model.EventOrderBy;
 import ru.practicum.service.EventService;
-import ru.practicum.util.ParamObject;
+import ru.practicum.util.PublicEventParamObj;
 
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
@@ -41,7 +41,7 @@ public class PublicEventController {
     ) {
         log.info("Requested all events by parameters: text - {}, categories - {}, paid - {}, rangeStart - {}, " +
                 "rangeEnd - {}, onlyAvailable - {}", text, categories, paid, rangeStart, rangeEnd, onlyAvailable);
-        ParamObject paramObj = ParamObject.newBuilder().withText(text).withCategories(categories).withPaid(paid)
+        PublicEventParamObj paramObj = PublicEventParamObj.newBuilder().withText(text).withCategories(categories).withPaid(paid)
                 .withRangeStart(rangeStart).withRangeEnd(rangeEnd).withOnlyAvailable(onlyAvailable).orderBy(orderBy)
                 .from(from).size(size).build();
         return service.findAll(paramObj);

@@ -15,6 +15,8 @@ import java.util.List;
         uses = {UserReferenceMapper.class, CategoryMapper.class, CategoryReferenceMapper.class}
 )
 public interface EventMapper {
+    List<EventFullDto> batchModelToFullDto(List<Event> entities);
+
     List<EventShortDto> batchModelToShortDto(List<Event> entities);
 
     @Mapping(source = "userId", target = "initiator")

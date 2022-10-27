@@ -3,6 +3,7 @@ package ru.practicum.util;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+//TODO remove
 public class OffsetPageable extends PageRequest {
     private final int offset;
 

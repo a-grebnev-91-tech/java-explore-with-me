@@ -15,8 +15,7 @@ import static ru.practicum.util.Constants.DEFAULT_SIZE_VALUE;
 @Getter
 @Setter
 @AllArgsConstructor
-//TODO rename
-public class ParamObject {
+public class PublicEventParamObj {
     private final String text;
     private final List<Long> categories;
     private final Boolean paid;
@@ -55,7 +54,7 @@ public class ParamObject {
         return text != null && !text.isBlank();
     }
 
-    private ParamObject(ParamBuilder builder) {
+    private PublicEventParamObj(ParamBuilder builder) {
         this.text = builder.text;
         this.categories = builder.categories;
         this.paid = builder.paid;
@@ -131,8 +130,8 @@ public class ParamObject {
             return this;
         }
 
-        public ParamObject build() {
-            return new ParamObject(this);
+        public PublicEventParamObj build() {
+            return new PublicEventParamObj(this);
         }
     }
 }
