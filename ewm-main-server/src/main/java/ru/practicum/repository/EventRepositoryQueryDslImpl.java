@@ -60,7 +60,7 @@ public class EventRepositoryQueryDslImpl implements EventRepositoryQueryDsl {
 
     private void applyDateRangeFilter(LocalDateTime rangeStart, LocalDateTime rangeEnd, JPAQuery<Event> jpaQuery) {
         if (rangeStart != null) {
-            jpaQuery.where(event.eventDate.after(rangeStart);
+            jpaQuery.where(event.eventDate.after(rangeStart));
         }
         if (rangeEnd != null) {
             jpaQuery.where(event.eventDate.before(rangeEnd));
