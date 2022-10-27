@@ -2,6 +2,7 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.compilation.CompilationDto;
@@ -13,7 +14,9 @@ import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.CompilationMapper;
 import ru.practicum.repository.CompilationRepository;
 import ru.practicum.repository.EventRepository;
+import ru.practicum.util.OffsetPageable;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -48,6 +51,25 @@ public class CompilationService {
     public void delete(long id) {
         Compilation comp = getCompilationOrThrow(id);
         compilationRepo.delete(comp);
+    }
+
+    public List<CompilationDto> findAll(Boolean pinned, int from, int size) {
+        Pageable pageable = OffsetPageable.of(from, size);
+        List<Compilation> compilations;
+        if (pinned == null) {
+            compilations = compilationRepo.findAll(pageable).getContent();
+            log.info("Received all compilations");
+        } else {
+            compilations = compilationRepo.findAllByPinned(pinned, pageable);
+            log.info("Received all compilations where pinned = {}", pinned);
+        }
+        return mapper.batchEntitiesToDtos(compilations);
+    }
+
+    public CompilationDto findById(long id) {
+        Compilation comp = getCompilationOrThrow(id);
+        log.info("Received compilation with ID {}", id);
+        return mapper.entityToDto(comp);
     }
 
     public void pin(long compId) {
