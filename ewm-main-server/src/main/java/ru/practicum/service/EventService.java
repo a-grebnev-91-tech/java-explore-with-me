@@ -8,9 +8,9 @@ import ru.practicum.dto.event.*;
 import ru.practicum.entity.Event;
 import ru.practicum.exception.ForbiddenOperationException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.exception.PatchException;
 import ru.practicum.mapper.EventMapper;
 import ru.practicum.model.EventState;
+import ru.practicum.model.UpdateEvent;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.util.AdminEventParamObj;
@@ -101,15 +101,10 @@ public class EventService {
 
     public EventFullDto updateByAdmin(long id, AdminUpdateEventRequest event) {
         Event originalEvent = getEventOrThrow(id);
-        if (Patcher.patch(originalEvent, mapper.updateDtoToModel(event))) {
-            log.info("Admin update event with ID {}", id);
-            return mapper.entityToFullDto(originalEvent);
-        } else {
-            throw new PatchException(
-                    "Error occurred",
-                    String.format("Patch %s couldn't be applied on %s", event, originalEvent)
-            );
-        }
+        UpdateEvent patch = mapper.updateDtoToModel(event);
+        Patcher.patchEvent(originalEvent, patch);
+        log.info("Admin update event with ID {}", id);
+        return mapper.entityToFullDto(originalEvent);
     }
 
     public EventFullDto updateByInitiator(long userId, UpdateEventRequest dto) {
@@ -127,15 +122,9 @@ public class EventService {
                         )
                 );
         }
-        if (Patcher.patch(originalEvent, mapper.updateDtoToModel(dto))) {
-            log.info("Initiator with ID {} update event with ID {}", userId, dto.getEventId());
-            return mapper.entityToFullDto(originalEvent);
-        } else {
-            throw new PatchException(
-                    "Error occurred",
-                    String.format("Patch %s couldn't be applied on %s", dto, originalEvent)
-            );
-        }
+        Patcher.patchEvent(originalEvent, mapper.updateDtoToModel(dto));
+        log.info("Initiator with ID {} update event with ID {}", userId, dto.getEventId());
+        return mapper.entityToFullDto(originalEvent);
     }
 
     private void checkUserExistingOrThrow(long userId) {
