@@ -8,10 +8,9 @@ import ru.practicum.validation.ExistingCategory;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.time.Instant;
 import java.time.LocalDateTime;
 
-import static ru.practicum.util.Constants.DATE_TIME_FORMAT_STRING;
+import static ru.practicum.util.Constants.DEFAULT_DATE_TIME_FORMAT;
 
 @Getter
 @Setter
@@ -26,7 +25,7 @@ public class NewEventDto {
     @Size(min = 20, max = 7000)
     private String description;
     @EventDateInFuture
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_TIME_FORMAT_STRING)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DEFAULT_DATE_TIME_FORMAT)
     private LocalDateTime eventDate;
     @ExistingCategory
     private Long category;

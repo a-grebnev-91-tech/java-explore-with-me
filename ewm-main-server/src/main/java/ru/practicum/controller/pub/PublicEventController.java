@@ -30,9 +30,9 @@ public class PublicEventController {
             @RequestParam(value = "text", required = false) String text,
             @RequestParam(value = "categories", required = false) List<Long> categories,
             @RequestParam(value = "paid", required = false) Boolean paid,
-            @RequestParam(value = "rangeStart", required = false) @DateTimeFormat(pattern = DATE_TIME_FORMAT_STRING)
+            @RequestParam(value = "rangeStart", required = false) @DateTimeFormat(pattern = DEFAULT_DATE_TIME_FORMAT)
             LocalDateTime rangeStart,
-            @RequestParam(value = "rangeEnd", required = false) @DateTimeFormat(pattern = DATE_TIME_FORMAT_STRING)
+            @RequestParam(value = "rangeEnd", required = false) @DateTimeFormat(pattern = DEFAULT_DATE_TIME_FORMAT)
             LocalDateTime rangeEnd,
             @RequestParam(value = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(value = "orderBy", required = false) EventOrderBy orderBy,
