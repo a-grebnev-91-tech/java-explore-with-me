@@ -1,10 +1,12 @@
 package ru.practicum.util;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.entity.Event;
 import ru.practicum.model.UpdateEvent;
 
+@Component
 public class Patcher {
-    public static void patchEvent(Event toPatch, UpdateEvent patch) {
+    public void patchEvent(Event toPatch, UpdateEvent patch) {
         if (patch.hasAnnotation()) {
             toPatch.setAnnotation(patch.getAnnotation());
         }

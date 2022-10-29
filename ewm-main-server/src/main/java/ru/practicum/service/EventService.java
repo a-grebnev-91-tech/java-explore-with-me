@@ -30,6 +30,7 @@ public class EventService {
     private final EventRepository eventRepo;
     private final UserRepository userRepo;
     private final EventMapper mapper;
+    private final Patcher patcher;
 
     public EventFullDto addEvent(NewEventDto event, long userId) {
         checkUserExistingOrThrow(userId);
@@ -102,7 +103,7 @@ public class EventService {
     public EventFullDto updateByAdmin(long id, AdminUpdateEventRequest event) {
         Event originalEvent = getEventOrThrow(id);
         UpdateEvent patch = mapper.updateDtoToModel(event);
-        Patcher.patchEvent(originalEvent, patch);
+        patcher.patchEvent(originalEvent, patch);
         log.info("Admin update event with ID {}", id);
         return mapper.entityToFullDto(originalEvent);
     }
@@ -122,7 +123,7 @@ public class EventService {
                         )
                 );
         }
-        Patcher.patchEvent(originalEvent, mapper.updateDtoToModel(dto));
+        patcher.patchEvent(originalEvent, mapper.updateDtoToModel(dto));
         log.info("Initiator with ID {} update event with ID {}", userId, dto.getEventId());
         return mapper.entityToFullDto(originalEvent);
     }
