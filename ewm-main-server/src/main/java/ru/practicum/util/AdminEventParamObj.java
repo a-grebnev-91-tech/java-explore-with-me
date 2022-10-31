@@ -38,6 +38,7 @@ public class AdminEventParamObj {
     public boolean hasStates() {
         return states != null && !states.isEmpty();
     }
+
     public boolean hasUsers() {
         return users != null && !users.isEmpty();
     }

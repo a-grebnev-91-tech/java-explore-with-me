@@ -1,7 +1,5 @@
 server:
   port: ${STATS_SERVER_PORT}
-#server:
-#  port: 9090
 spring:
   jpa:
     properties:
@@ -15,10 +13,6 @@ spring:
       mode: always
   datasource:
     driverClassName: org.postgresql.Driver
-#    url: jdbc:postgresql://localhost:5432/explore_with_me_stats
-#    username: root
-#    password: root
-#    TODO
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
