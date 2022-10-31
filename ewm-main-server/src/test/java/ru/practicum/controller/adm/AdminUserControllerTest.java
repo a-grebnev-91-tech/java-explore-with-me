@@ -73,33 +73,7 @@ class AdminUserControllerTest {
     }
 
     @Test
-    void test2_shouldNotAddUserWithConflictEmail() throws Exception {
-        UserDto outputDto = getDtos(1).get(0);
-
-        NewUserRequest inputDto = new NewUserRequest();
-        inputDto.setEmail(outputDto.getEmail());
-        inputDto.setName(outputDto.getName());
-
-        User user = new User();
-        user.setId(outputDto.getId());
-        user.setName(outputDto.getName());
-        user.setEmail(outputDto.getEmail());
-
-        when(repository.findByEmail(inputDto.getEmail())).thenReturn(Optional.of(user));
-
-        mvc.perform(post(PATH)
-                        .content(objectMapper.writeValueAsString(inputDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.status", is("CONFLICT"), String.class))
-                .andExpect(jsonPath("$.reason", is("Email should be unique"), String.class))
-                .andExpect(jsonPath("$.message", startsWith("User with email"), String.class));
-    }
-
-    @Test
-    void test3_shouldNotCreateUserWithInvalidEmail() throws Exception {
+    void test2_shouldNotCreateUserWithInvalidEmail() throws Exception {
         NewUserRequest inputDto = new NewUserRequest();
         inputDto.setEmail("mail");
         inputDto.setName("name");
