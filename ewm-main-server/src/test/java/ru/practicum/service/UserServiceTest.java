@@ -41,7 +41,7 @@ class UserServiceTest {
     private UserDto outputDto;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         user = new User();
         user.setEmail(EMAIL);
         user.setId(ID);
