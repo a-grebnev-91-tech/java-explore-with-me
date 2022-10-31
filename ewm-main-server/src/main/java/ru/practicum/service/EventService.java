@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.StatsClient;
 import ru.practicum.dto.EndpointHit;
+import ru.practicum.dto.ViewStats;
 import ru.practicum.dto.event.*;
 import ru.practicum.entity.Event;
 import ru.practicum.exception.ForbiddenOperationException;
@@ -21,8 +22,9 @@ import ru.practicum.util.PublicEventParamObj;
 import ru.practicum.util.Patcher;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -196,8 +198,14 @@ public class EventService {
     }
 
     private void updateViews(Event... events) {
-        //TODO statistic case if no STAT
-
+        Map<Long, Event> eventMap = Arrays.stream(events).collect(Collectors.toMap(Event::getId, Function.identity()));
+        List<String> uris = eventMap.keySet().stream().map(id -> "/events/" + id).collect(Collectors.toList());
+        List<ViewStats> stats = statsClient.stats(uris);
+        for (ViewStats stat : stats) {
+            String[] uri = stat.getUri().split("/");
+            long id = Long.parseLong(uri[uri.length - 1]);
+            eventMap.get(id).setViews(stat.getHits());
+        }
     }
 
     private void writeStatistics(String ip, String uri) {

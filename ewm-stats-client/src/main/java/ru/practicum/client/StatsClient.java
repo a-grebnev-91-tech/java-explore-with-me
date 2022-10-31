@@ -75,18 +75,15 @@ public class StatsClient {
         builder
                 .append(statsUri)
                 .append("?")
-                .append("start=").append(start.format(formatter))
+                .append("start=").append(URLEncoder.encode(start.format(formatter), StandardCharsets.UTF_8))
                 .append("&")
-                .append("end=").append(end.format(formatter));
+                .append("end=").append(URLEncoder.encode(end.format(formatter), StandardCharsets.UTF_8));
         if (uris != null && !uris.isEmpty()) {
-            builder
-                    .append("&")
-                    .append("uris=");
             uris.forEach(
                     uri -> {
                         builder.append("&").append("uris=").append(uri);
                     });
         }
-        return URLEncoder.encode(builder.toString(), StandardCharsets.UTF_8);
+        return builder.toString();
     }
 }
