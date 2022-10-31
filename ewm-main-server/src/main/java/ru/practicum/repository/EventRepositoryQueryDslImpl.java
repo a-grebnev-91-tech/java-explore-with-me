@@ -32,10 +32,13 @@ public class EventRepositoryQueryDslImpl implements EventRepositoryQueryDsl {
             applyPaidFilter(paramObj.getPaid(), jpaQuery);
         if (paramObj.hasOnlyAvailable())
             applyOnlyAvailableFilter(paramObj.getOnlyAvailable(), jpaQuery);
-        if (paramObj.hasOrderBy())
-            applyOrderByFilter(paramObj.getOrderBy(), jpaQuery);
         applyDateRangeFilter(paramObj.getRangeStart(), paramObj.getRangeEnd(), jpaQuery);
-        jpaQuery.offset(paramObj.getOffset()).limit(paramObj.getSize());
+        if (paramObj.hasOrderBy()) {
+            if (paramObj.getOrderBy() != EventOrderBy.VIEWS) {
+                applyOrderByFilter(paramObj.getOrderBy(), jpaQuery);
+                jpaQuery.offset(paramObj.getOffset()).limit(paramObj.getSize());
+            }
+        }
         return jpaQuery.fetch();
     }
 
@@ -71,13 +74,8 @@ public class EventRepositoryQueryDslImpl implements EventRepositoryQueryDsl {
     }
 
     private void applyOrderByFilter(EventOrderBy orderBy, JPAQuery<Event> jpaQuery) {
-        switch (orderBy) {
-            case EVENT_DATE:
-                jpaQuery.orderBy(event.eventDate.desc());
-                break;
-            case VIEWS:
-                jpaQuery.orderBy(event.views.desc());
-                break;
+        if (orderBy == EventOrderBy.EVENT_DATE) {
+            jpaQuery.orderBy(event.eventDate.desc());
         }
     }
 

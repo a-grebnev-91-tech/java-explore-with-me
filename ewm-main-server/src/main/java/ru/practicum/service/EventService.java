@@ -12,6 +12,7 @@ import ru.practicum.entity.Event;
 import ru.practicum.exception.ForbiddenOperationException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.EventMapper;
+import ru.practicum.model.EventOrderBy;
 import ru.practicum.model.EventState;
 import ru.practicum.model.UpdateEvent;
 import ru.practicum.repository.EventRepository;
@@ -63,6 +64,9 @@ public class EventService {
         List<Event> events = eventRepo.findAllByPublicParams(paramObj);
         log.info("Found {} events", events.size());
         updateViews(events.toArray(new Event[0]));
+        if (paramObj.getOrderBy() == EventOrderBy.VIEWS) {
+            events = sortAndTrimByViews(events, paramObj);
+        }
         writeStatistics(ip, uri);
         return mapper.batchModelToShortDto(events);
     }
@@ -191,6 +195,11 @@ public class EventService {
     private void publish(Event event) {
         event.setState(EventState.PUBLISHED);
         event.setPublishedOn(LocalDateTime.now());
+    }
+
+    private List<Event> sortAndTrimByViews(List<Event> events, PublicEventParamObj paramObj) {
+        events.sort((o1, o2) -> Long.compare(o1.getViews(), o2.getViews()));
+        return events.subList(paramObj.getOffset(), paramObj.getOffset() + paramObj.getSize());
     }
 
     private void reject(Event event) {

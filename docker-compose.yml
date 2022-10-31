@@ -1,15 +1,55 @@
 version: '3.1'
 services:
   stats-server:
+    build: emw-stats-server/.
+    container_name: "ewm-stats-server"
     ports:
       - "9090:9090"
+      - "9091:9090"
+    depends_on:
+      - stats-db
+    environment:
+      - STATS_SERVER_PORT = 9090
+      - STATS_SERVER_URL = http://localhost
+      - SPRING_DATASOURCE_URL = jdbc:postgresql://stats-db:5432/explore_with_me_stats
+      - SPRING_DATASOURCE_USERNAME = root
+      - SPRING_DATASOURCE_PASSWORD = root
 
   stats-db:
     image: postgres:14-alpine
+    container_name: "ewm-stats-db"
+    ports:
+      - "6541:5432"
+    environment:
+      - POSTGRES_DB=explore_with_me_stats
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
 
   ewm-service:
+    build: ewm-main-server/.
+    container_name: "ewm-main-server"
     ports:
       - "8080:8080"
+      - "8081:8081"
+    depends_on:
+      - stats-server
+    environment:
+      - STATS_SERVER_PORT = 9090
+      - STATS_SERVER_URL = http://localhost
+      - SPRING_DATASOURCE_URL = jdbc:postgresql://ewm-db:5432/explore_with_me
+      - SPRING_DATASOURCE_USERNAME = root
+      - SPRING_DATASOURCE_PASSWORD = root
 
   ewm-db:
     image: postgres:14-alpine
+    container_name: "ewm-main-db"
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=explore_with_me
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+
+volumes:
+  stats-db:
+  ewm-db:
