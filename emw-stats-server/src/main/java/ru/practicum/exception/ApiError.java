@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static ru.practicum.Constants.DEFAULT_DATE_TIME_FORMAT;
+import static ru.practicum.util.Constants.DEFAULT_DATE_TIME_FORMAT;
 
 @Getter
 @Setter

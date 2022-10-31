@@ -3,14 +3,14 @@ package ru.practicum.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import ru.practicum.dto.ViewStats;
+import ru.practicum.controller.ViewStats;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface StatsRepository extends JpaRepository<StatisticEntity, Long> {
     @Query(
-            "SELECT new ru.practicum.dto.ViewStats (e.app, e.uri, count(e)) " +
+            "SELECT new ru.practicum.controller.ViewStats (e.app, e.uri, count(e)) " +
                     "FROM StatisticEntity e " +
                     "WHERE e.timestamp >= :start " +
                     "AND e.timestamp <= :end " +
@@ -24,7 +24,7 @@ public interface StatsRepository extends JpaRepository<StatisticEntity, Long> {
     );
 
     @Query(
-            "SELECT new ru.practicum.dto.ViewStats (e.app, e.uri, count(e)) " +
+            "SELECT new ru.practicum.controller.ViewStats (e.app, e.uri, count(e)) " +
                     "FROM StatisticEntity e " +
                     "WHERE e.timestamp >= :start " +
                     "AND e.timestamp <= :end " +

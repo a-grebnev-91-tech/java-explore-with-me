@@ -3,8 +3,8 @@ package ru.practicum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.practicum.dto.EndpointHit;
-import ru.practicum.dto.ViewStats;
+import ru.practicum.controller.EndpointHit;
+import ru.practicum.controller.ViewStats;
 import ru.practicum.mapper.StatsMapper;
 import ru.practicum.repository.StatisticEntity;
 import ru.practicum.repository.StatsRepository;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static ru.practicum.Constants.DEFAULT_DATE_TIME_FORMAT;
+import static ru.practicum.util.Constants.DEFAULT_DATE_TIME_FORMAT;
 
 @Slf4j
 @Service

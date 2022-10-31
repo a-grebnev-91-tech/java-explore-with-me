@@ -2,16 +2,10 @@ package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.service.StatsService;
-import ru.practicum.dto.EndpointHit;
-import ru.practicum.dto.ViewStats;
 
-import java.time.LocalDateTime;
 import java.util.List;
-
-import static ru.practicum.Constants.DEFAULT_DATE_TIME_FORMAT;
 
 @Slf4j
 @RestController

@@ -1,4 +1,4 @@
-package ru.practicum.dto;
+package ru.practicum.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

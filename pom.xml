@@ -5,7 +5,6 @@
     <modules>
         <module>ewm-main-server</module>
         <module>emw-stats-server</module>
-        <module>ewm-stats-client</module>
     </modules>
 
     <parent>

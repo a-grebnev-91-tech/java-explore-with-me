@@ -1,4 +1,4 @@
-package ru.practicum.client;
+package ru.practicum.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -10,8 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ru.practicum.dto.EndpointHit;
-import ru.practicum.dto.ViewStats;
+import ru.practicum.dto.stats.EndpointHit;
+import ru.practicum.dto.stats.ViewStats;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static ru.practicum.Constants.DEFAULT_DATE_TIME_FORMAT;
+import static ru.practicum.util.Constants.DEFAULT_DATE_TIME_FORMAT;
 
 @Slf4j
 @Service
