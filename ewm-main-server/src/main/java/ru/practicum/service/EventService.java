@@ -21,6 +21,7 @@ import ru.practicum.util.PublicEventParamObj;
 import ru.practicum.util.Patcher;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -51,6 +52,7 @@ public class EventService {
                     String.format("Event with id %d in %s state", eventId, event.getState().toString())
             );
         event.setState(EventState.CANCELED);
+        updateViews(event);
         log.info("Initiator with ID {} canceled event with ID {}", userId, eventId);
         return mapper.entityToFullDto(event);
     }
@@ -58,12 +60,15 @@ public class EventService {
     public List<EventShortDto> findAll(PublicEventParamObj paramObj, String ip, String uri) {
         List<Event> events = eventRepo.findAllByPublicParams(paramObj);
         log.info("Found {} events", events.size());
+        updateViews(events.toArray(new Event[0]));
         writeStatistics(ip, uri);
         return mapper.batchModelToShortDto(events);
     }
 
     public List<EventFullDto> findAll(AdminEventParamObj paramObj) {
-        return mapper.batchModelToFullDto(eventRepo.findAllByAdminParams(paramObj));
+        List<Event> events = eventRepo.findAllByAdminParams(paramObj);
+        updateViews(events.toArray(new Event[0]));
+        return mapper.batchModelToFullDto(events);
     }
 
     public EventFullDto findById(long id, String ip, String url) {
@@ -71,6 +76,7 @@ public class EventService {
                 () -> new NotFoundException("Event not found", String.format("Event with id %d isn't exist", id))
         );
         log.info("Found event with ID {}", event.getId());
+        updateViews(event);
         writeStatistics(ip, url);
         return mapper.entityToFullDto(event);
     }
@@ -78,13 +84,16 @@ public class EventService {
     public List<EventShortDto> findByInitiator(long userId, int from, int size) {
         checkUserExistingOrThrow(userId);
         OffsetPageable pageable = OffsetPageable.of(from, size);
+        List<Event> events = eventRepo.findByInitiatorId(userId, pageable);
+        updateViews(events.toArray(new Event[0]));
         log.info("Initiator with ID {} received all his events", userId);
-        return mapper.batchModelToShortDto(eventRepo.findByInitiatorId(userId, pageable));
+        return mapper.batchModelToShortDto(events);
     }
 
     public EventFullDto findByIdForInitiator(long initiatorId, long eventId) {
         Event event = getEventOrThrow(eventId);
         checkInitiatorOrThrow(event, initiatorId);
+        updateViews(event);
         log.info("Initiator with ID {} received event with ID {}", initiatorId, eventId);
         return mapper.entityToFullDto(event);
     }
@@ -93,6 +102,7 @@ public class EventService {
         Event event = getEventOrThrow(id);
         couldBePublishedOrThrow(event);
         publish(event);
+        updateViews(event);
         return mapper.entityToFullDto(event);
     }
 
@@ -100,6 +110,7 @@ public class EventService {
         Event event = getEventOrThrow(id);
         couldBeRejectOrThrow(event);
         reject(event);
+        updateViews(event);
         return mapper.entityToFullDto(event);
     }
 
@@ -107,6 +118,7 @@ public class EventService {
         Event originalEvent = getEventOrThrow(id);
         UpdateEvent patch = mapper.updateDtoToModel(event);
         patcher.patchEvent(originalEvent, patch);
+        updateViews(originalEvent);
         log.info("Admin update event with ID {}", id);
         return mapper.entityToFullDto(originalEvent);
     }
@@ -127,6 +139,7 @@ public class EventService {
                 );
         }
         patcher.patchEvent(originalEvent, mapper.updateDtoToModel(dto));
+        updateViews(originalEvent);
         log.info("Initiator with ID {} update event with ID {}", userId, dto.getEventId());
         return mapper.entityToFullDto(originalEvent);
     }
@@ -180,6 +193,11 @@ public class EventService {
 
     private void reject(Event event) {
         event.setState(EventState.CANCELED);
+    }
+
+    private void updateViews(Event... events) {
+        //TODO statistic case if no STAT
+
     }
 
     private void writeStatistics(String ip, String uri) {

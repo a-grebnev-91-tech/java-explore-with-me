@@ -10,9 +10,9 @@ import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.querydsl.core.group.GroupBy.groupBy;
 import static ru.practicum.repository.QStatisticEntity.statisticEntity;
 
+//todo rm
 @RequiredArgsConstructor
 public class StatsRepositoryQueryDslImpl implements StatsRepositoryQueryDsl {
     @PersistenceContext

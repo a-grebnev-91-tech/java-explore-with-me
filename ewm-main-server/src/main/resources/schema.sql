@@ -41,8 +41,7 @@ CREATE TABLE IF NOT EXISTS events
     participant_limit  INT       NOT NULL DEFAULT 0,
     confirmed_requests BIGINT    NOT NULL DEFAULT 0,
     lat                FLOAT     NOT NULL,
-    lon                FLOAT     NOT NULL,
-    views              BIGINT    NOT NULL DEFAULT 0
+    lon                FLOAT     NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS events_index ON events (title, annotation, paid, category_id, event_date);
