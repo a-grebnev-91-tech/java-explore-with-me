@@ -11,6 +11,7 @@ import ru.practicum.model.EventOrderBy;
 import ru.practicum.service.EventService;
 import ru.practicum.util.PublicEventParamObj;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,19 +38,20 @@ public class PublicEventController {
             @RequestParam(value = "onlyAvailable", defaultValue = "false") Boolean onlyAvailable,
             @RequestParam(value = "orderBy", required = false) EventOrderBy orderBy,
             @RequestParam(value = "from", defaultValue = DEFAULT_FROM_VALUE) int from,
-            @RequestParam(value = "size", defaultValue = DEFAULT_SIZE_VALUE) int size
+            @RequestParam(value = "size", defaultValue = DEFAULT_SIZE_VALUE) int size,
+            HttpServletRequest request
     ) {
         log.info("Requested all events by parameters: text - {}, categories - {}, paid - {}, rangeStart - {}, " +
                 "rangeEnd - {}, onlyAvailable - {}", text, categories, paid, rangeStart, rangeEnd, onlyAvailable);
         PublicEventParamObj paramObj = PublicEventParamObj.newBuilder().withText(text).withCategories(categories).withPaid(paid)
                 .withRangeStart(rangeStart).withRangeEnd(rangeEnd).withOnlyAvailable(onlyAvailable).orderBy(orderBy)
                 .from(from).size(size).build();
-        return service.findAll(paramObj);
+        return service.findAll(paramObj, request.getRemoteAddr(), request.getRequestURI());
     }
 
     @GetMapping("/{id}")
-    public EventFullDto findById(@PathVariable("id") @Positive long id) {
+    public EventFullDto findById(@PathVariable("id") @Positive long id, HttpServletRequest request) {
         log.info("Attempt to receive event with ID {}", id);
-        return service.findById(id);
+        return service.findById(id, request.getRemoteAddr(), request.getRequestURI());
     }
 }

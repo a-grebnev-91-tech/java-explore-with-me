@@ -1,0 +1,26 @@
+server:
+  port: 9090
+#  port: ${STATS_SERVER_PORT}
+stats-server:
+  url: http://localhost:9090
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQL10Dialect
+        format_sql: true
+    hibernate:
+      ddl-auto: none
+  sql:
+    init:
+      mode: always
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/explore_with_me_stats
+    username: root
+    password: root
+#    TODO
+#    url: ${SPRING_DATASOURCE_URL}
+#    username: ${SPRING_DATASOURCE_USERNAME}
+#    password: ${SPRING_DATASOURCE_PASSWORD}
+

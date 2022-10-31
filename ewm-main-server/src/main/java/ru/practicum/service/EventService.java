@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.StatsClient;
+import ru.practicum.dto.EndpointHit;
 import ru.practicum.dto.event.*;
 import ru.practicum.entity.Event;
 import ru.practicum.exception.ForbiddenOperationException;
@@ -21,7 +23,6 @@ import ru.practicum.util.Patcher;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//TODO check pre-moderation of requests
 @Slf4j
 @Service
 @Transactional
@@ -29,6 +30,7 @@ import java.util.List;
 public class EventService {
     private final EventRepository eventRepo;
     private final UserRepository userRepo;
+    private final StatsClient statsClient;
     private final EventMapper mapper;
     private final Patcher patcher;
 
@@ -53,22 +55,23 @@ public class EventService {
         return mapper.entityToFullDto(event);
     }
 
-    //TODO add statistics
-    //TODO информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
-    public List<EventShortDto> findAll(PublicEventParamObj paramObj) {
-        return mapper.batchModelToShortDto(eventRepo.findAllByPublicParams(paramObj));
+    public List<EventShortDto> findAll(PublicEventParamObj paramObj, String ip, String uri) {
+        List<Event> events = eventRepo.findAllByPublicParams(paramObj);
+        log.info("Found {} events", events.size());
+        writeStatistics(ip, uri);
+        return mapper.batchModelToShortDto(events);
     }
 
     public List<EventFullDto> findAll(AdminEventParamObj paramObj) {
         return mapper.batchModelToFullDto(eventRepo.findAllByAdminParams(paramObj));
     }
 
-    //TODO add statistics
-    //информацию о том, что по этому эндпоинту был осуществлен и обработан запрос, нужно сохранить в сервисе статистики
-    public EventFullDto findById(long id) {
+    public EventFullDto findById(long id, String ip, String url) {
         Event event = eventRepo.findByIdAndState(id, EventState.PUBLISHED).orElseThrow(
                 () -> new NotFoundException("Event not found", String.format("Event with id %d isn't exist", id))
         );
+        log.info("Found event with ID {}", event.getId());
+        writeStatistics(ip, url);
         return mapper.entityToFullDto(event);
     }
 
@@ -177,5 +180,14 @@ public class EventService {
 
     private void reject(Event event) {
         event.setState(EventState.CANCELED);
+    }
+
+    private void writeStatistics(String ip, String uri) {
+        EndpointHit dto = new EndpointHit();
+        dto.setApp("ewm-main-server");
+        dto.setUri(uri);
+        dto.setIp(ip);
+        dto.setTimestamp(LocalDateTime.now());
+        statsClient.hit(dto);
     }
 }

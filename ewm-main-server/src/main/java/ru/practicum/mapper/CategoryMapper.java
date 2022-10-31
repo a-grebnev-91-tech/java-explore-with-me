@@ -1,7 +1,6 @@
 package ru.practicum.mapper;
 
 import org.mapstruct.Mapper;
-import org.springframework.data.domain.Page;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.category.NewCategoryDto;
 import ru.practicum.entity.Category;
