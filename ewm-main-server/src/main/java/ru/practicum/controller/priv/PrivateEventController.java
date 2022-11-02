@@ -2,20 +2,15 @@ package ru.practicum.controller.priv;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.event.*;
 import ru.practicum.service.EventService;
-import ru.practicum.util.PublicEventParamObj;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
-import java.time.LocalDateTime;
 import java.util.List;
-
-import static ru.practicum.util.Constants.DEFAULT_DATE_TIME_FORMAT;
 
 @Slf4j
 @Validated
@@ -38,18 +33,6 @@ public class PrivateEventController {
     ) {
         log.info("User with ID {} attempt to cancel his event with ID {}", userId, eventId);
         return service.cancelById(userId, eventId);
-    }
-
-    @GetMapping("/published")
-    public List<EventShortDto> findAllPublished(
-            @PathVariable("userId") @Positive long userId,
-            @RequestParam(value = "rangeStart", required = false) @DateTimeFormat(pattern = DEFAULT_DATE_TIME_FORMAT)
-            LocalDateTime rangeStart,
-            @RequestParam(value = "rangeEnd", required = false) @DateTimeFormat(pattern = DEFAULT_DATE_TIME_FORMAT)
-            LocalDateTime rangeEnd
-    ) {
-        log.info("User with ID {} attempt to receive all his published events", userId);
-        return service.findAllByParticipant(userId, rangeStart, rangeEnd);
     }
 
     @GetMapping("/{eventId}")
