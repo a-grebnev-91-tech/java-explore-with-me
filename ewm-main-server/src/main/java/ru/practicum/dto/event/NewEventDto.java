@@ -7,6 +7,7 @@ import ru.practicum.validation.EventDateInFuture;
 import ru.practicum.validation.ExistingCategory;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -31,6 +32,7 @@ public class NewEventDto {
     private Long category;
     private Boolean paid = false;
     private Boolean requestModeration = true;
+    @PositiveOrZero
     private Integer participantLimit = 0;
     @NotNull
     private Location location;
