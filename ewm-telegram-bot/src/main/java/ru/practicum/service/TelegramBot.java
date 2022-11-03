@@ -12,6 +12,8 @@ import ru.practicum.entity.TelegramUser;
 import ru.practicum.mapper.UserMapper;
 import ru.practicum.repository.BotRepository;
 
+import java.util.Optional;
+
 import static ru.practicum.util.Commands.*;
 
 @Slf4j
@@ -47,10 +49,18 @@ public class TelegramBot extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            String message = update.getMessage().getText();
-            switch (message) {
+            Message message = update.getMessage();
+            long chatId = message.getChatId();
+            switch (message.getText()) {
                 case START_COMMAND:
                     executeStart(update.getMessage());
+                    break;
+                case HELP_COMMAND:
+                    if (isAuthInApp(chatId)) {
+                        sendMessage(chatId, getHelpAuthMsg());
+                    } else {
+                        sendMessage(chatId, getHelpMsg());
+                    }
                     break;
                 case PUBLISHED_ALL_COMMAND:
                     executeAllPublishedCommand(update.getMessage());
@@ -59,7 +69,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     executeMyPublishedCommand(update.getMessage());
                     break;
                 default:
-                    sendMessage(update.getMessage().getChatId(), "Извините, такая команда не поддерживается!");
+                    sendMessage(chatId, COMMAND_NOT_SUPPORTED_MESSAGE);
             }
         }
     }
@@ -72,7 +82,21 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void executeAllPublishedCommand(Message message) {
-        throw new RuntimeException("not impl");
+        long chatId = message.getChatId();
+        Optional<TelegramUser> mayBeUser = repo.findById(chatId);
+        if (mayBeUser.isPresent()) {
+            TelegramUser user = mayBeUser.get();
+            if (user.getNotifyEventPublished()) {
+                sendMessage(chatId, ALREADY_SUBSCRIBED_MESSAGE);
+                log.info("User with telegram ID {} already subscribed to event publishing notification", chatId);
+                return;
+            }
+            user.setNotifyEventPublished(true);
+            sendMessage(chatId, SUBSCRIBE_EVENT_PUBLISHED_MESSAGE);
+            log.info("User with telegram ID {} subscribed to event publishing notification", chatId);
+        } else {
+            sendMessage(chatId, NO_AUTH_MESSAGE);
+        }
     }
 
     private boolean executeMessage(SendMessage message) {
@@ -93,21 +117,31 @@ public class TelegramBot extends TelegramLongPollingBot {
         startCommandReceived(message.getChatId(), message.getFrom().getFirstName(), registerUser(message));
     }
 
-    private String getHelp() {
-        return "Для вас доступны следующие комманды:\n" +
-                PUBLISHED_ALL_COMMAND + PUBLISHED_ALL_COMMAND_TEXT +
-                HELP_COMMAND + HELP_COMMAND_TEXT;
+    private String getHelpMsg() {
+        return AVAILABLE_COMMANDS_MESSAGE +
+                PUBLISHED_ALL_COMMAND + PUBLISHED_ALL_COMMAND_MESSAGE +
+                HELP_COMMAND + HELP_COMMAND_MESSAGE;
     }
 
-    private String getHelpAuth() {
-        return "Для вас доступны следующие комманды:\n" +
-                PUBLISHED_ALL_COMMAND + PUBLISHED_ALL_COMMAND_TEXT +
-                PUBLISHED_MY_COMMAND + PUBLISHED_MY_COMMAND_TEXT +
-                HELP_COMMAND + HELP_COMMAND_TEXT;
+    private String getHelpAuthMsg() {
+        return AVAILABLE_COMMANDS_MESSAGE +
+                PUBLISHED_ALL_COMMAND + PUBLISHED_ALL_COMMAND_MESSAGE +
+                PUBLISHED_MY_COMMAND + PUBLISHED_MY_COMMAND_MESSAGE +
+                HELP_COMMAND + HELP_COMMAND_MESSAGE;
+    }
+
+    private boolean isAuthInApp(long chatId) {
+        Optional<TelegramUser> user = repo.findById(chatId);
+        if (user.isEmpty()) return false;
+        return user.get().getEwmId() != null;
+    }
+
+    private boolean isAuthInBot(long chatId) {
+        return repo.existsById(chatId);
     }
 
     private boolean registerUser(Message message) {
-        if (repo.existsById(message.getChatId())) {
+        if (isAuthInBot(message.getChatId())) {
             TelegramUser user = mapper.mapToUser(message.getFrom());
             repo.save(user);
             log.info("User with ID {} saved", user.getTelegramId());
@@ -123,7 +157,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (isNew) {
             answer.append(", приятно познакомиться!");
             answer.append(System.lineSeparator());
-            answer.append(getHelp());
+            answer.append(getHelpMsg());
         } else {
             answer.append(", рады видеть вас снова!");
         }
