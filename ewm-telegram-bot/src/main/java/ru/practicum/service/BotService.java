@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EventNotification;
+import ru.practicum.dto.RequestNotification;
 import ru.practicum.entity.TelegramUser;
 import ru.practicum.repository.BotRepository;
 
@@ -20,10 +21,19 @@ public class BotService {
     private final TelegramBot bot;
     private final BotRepository repo;
 
+    public void bindTelegram(long ewmId, long tgId) {
+        throw new RuntimeException("not impl");
+    }
+
+    public void deleteTelegram(long ewmId) {
+        throw new RuntimeException("not impl");
+    }
+
     public void sendEventNotification(EventNotification dto) {
         switch (dto.getAction()) {
             case PUBLISHED:
-                sendEventPublished(dto);
+                sendEventPublishedForInitiator(dto);
+                sendEventPublishedForAllUsers(dto);
                 break;
             case INCOMING:
                 sendEventIncoming(dto);
@@ -34,17 +44,16 @@ public class BotService {
         }
     }
 
-    private void sendEventCanceled(EventNotification dto) {
+    public void sendRequestNotification(RequestNotification dto) {
+        throw new RuntimeException("not impl");
     }
 
-    private void sendEventPublished(EventNotification dto) {
-        Optional<TelegramUser> initiator = repo.findByEwmId(dto.getInitiatorId());
-        if (initiator.isPresent()) {
-            String textForInitiator = prepareEventPublishedInitiatorText(dto);
-            if (bot.sendMessage(initiator.get().getTelegramId(), textForInitiator))
-                log.info("Notification for initiator has been sent");
-        }
+    private void sendEventCanceled(EventNotification dto) {
+        throw new RuntimeException("not impl");
+    }
 
+
+    private void sendEventPublishedForAllUsers(EventNotification dto) {
         List<TelegramUser> idsToNotify = repo.findAllByNotifyEventPublished(true);
         String textForAll = prepareEventPublishedText(dto);
         for (TelegramUser user : idsToNotify) {
@@ -53,8 +62,17 @@ public class BotService {
         }
     }
 
-    private void sendEventIncoming(EventNotification dto) {
+    private void sendEventPublishedForInitiator(EventNotification dto) {
+        Optional<TelegramUser> initiator = repo.findByEwmId(dto.getInitiatorId());
+        if (initiator.isPresent()) {
+            String textForInitiator = prepareEventPublishedInitiatorText(dto);
+            if (bot.sendMessage(initiator.get().getTelegramId(), textForInitiator))
+                log.info("Notification for initiator has been sent");
+        }
+    }
 
+    private void sendEventIncoming(EventNotification dto) {
+        throw new RuntimeException("not impl");
     }
 
     private String prepareEventPublishedInitiatorText(EventNotification event) {
