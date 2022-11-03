@@ -15,6 +15,7 @@ import ru.practicum.repository.BotRepository;
 import java.util.Optional;
 
 import static ru.practicum.util.Commands.*;
+import static ru.practicum.util.Messages.*;
 
 @Slf4j
 @Component
