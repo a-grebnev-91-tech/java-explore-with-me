@@ -5,6 +5,9 @@
     <modules>
         <module>ewm-main-server</module>
         <module>emw-stats-server</module>
+        <module>ewm-notification-dto</module>
+        <module>ewm-constants</module>
+        <module>ewm-telegram-bot</module>
     </modules>
 
     <parent>

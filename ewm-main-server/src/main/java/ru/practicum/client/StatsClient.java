@@ -1,4 +1,4 @@
-package ru.practicum.service;
+package ru.practicum.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static ru.practicum.util.Constants.DEFAULT_DATE_TIME_FORMAT;
+import static ru.practicum.util.Constants.*;
 
 @Slf4j
 @Service
@@ -30,13 +30,8 @@ public class StatsClient {
     private final RestTemplate rest;
     private final String serverUrl;
     private final DateTimeFormatter formatter;
-    private final String hitUri = "/hit";
-    private final String statsUri = "/stats";
 
-    public StatsClient(@Value("${stats-server.url}") String serverUrl,
-                       RestTemplateBuilder builder,
-                       ObjectMapper mapper
-    ) {
+    public StatsClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
         this.serverUrl = serverUrl;
         this.rest = builder.build();
         this.formatter = DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT);
@@ -47,7 +42,7 @@ public class StatsClient {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<EndpointHit> httpEntity = new HttpEntity<>(dto, headers);
-        ResponseEntity<String> response = rest.postForEntity(serverUrl + hitUri, httpEntity, String.class);
+        ResponseEntity<String> response = rest.postForEntity(serverUrl + HIT_API_PREFIX, httpEntity, String.class);
         if (response.getStatusCode().is2xxSuccessful()) {
             log.info("Stats server write statistics");
         } else {
@@ -73,7 +68,7 @@ public class StatsClient {
     private String buildStatUrl(LocalDateTime start, LocalDateTime end, List<String> uris) {
         StringBuilder builder = new StringBuilder(serverUrl);
         builder
-                .append(statsUri)
+                .append(STATS_API_PREFIX)
                 .append("?")
                 .append("start=").append(URLEncoder.encode(start.format(formatter), StandardCharsets.UTF_8))
                 .append("&")

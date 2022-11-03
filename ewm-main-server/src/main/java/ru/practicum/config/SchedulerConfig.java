@@ -1,4 +1,4 @@
-package ru.practicum.service.notification.config;
+package ru.practicum.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;

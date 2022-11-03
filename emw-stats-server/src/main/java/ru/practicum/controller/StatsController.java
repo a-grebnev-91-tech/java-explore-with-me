@@ -7,13 +7,16 @@ import ru.practicum.service.StatsService;
 
 import java.util.List;
 
+import static ru.practicum.util.Constants.HIT_API_PREFIX;
+import static ru.practicum.util.Constants.STATS_API_PREFIX;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class StatsController {
     private final StatsService service;
 
-    @GetMapping("/stats")
+    @GetMapping(STATS_API_PREFIX)
     public List<ViewStats> getStats(
             @RequestParam("start") String start,
             @RequestParam("end") String end,
@@ -24,7 +27,7 @@ public class StatsController {
         return service.getStats(start, end, uris, unique);
     }
 
-    @PostMapping("/hit")
+    @PostMapping(HIT_API_PREFIX)
     public void writeStats(@RequestBody EndpointHit dto) {
         log.info("Writing statistics for app {}, uri {}", dto.getApp(), dto.getUri());
         service.writeStats(dto);

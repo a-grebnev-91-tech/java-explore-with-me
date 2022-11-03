@@ -1,5 +1,8 @@
-stats-server:
-  url: ${STATS_SERVER_URL}
+server:
+  port: ${TELEGRAM_BOT_PORT}
+bot:
+  name: ExploreWithMeBot
+  token: ${EXPLORE_WITH_ME_BOT_TOKEN}
 spring:
   jpa:
     properties:
@@ -34,11 +37,9 @@ spring:
     init:
       mode: always
   datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/explore_with_me
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:file:./db/telegram_users
     username: root
     password: root
-stats-server:
-  url: http://localhost:9090
-telegram-server:
-  url: http://localhost:7070
+server:
+  port: 7070
