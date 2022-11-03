@@ -50,26 +50,14 @@ public class TelegramBot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             Message message = update.getMessage();
-            long chatId = message.getChatId();
-            switch (message.getText()) {
-                case START_COMMAND:
-                    executeStart(update.getMessage());
-                    break;
-                case HELP_COMMAND:
-                    if (isAuthInApp(chatId)) {
-                        sendMessage(chatId, getHelpAuthMsg());
-                    } else {
-                        sendMessage(chatId, getHelpMsg());
-                    }
-                    break;
-                case PUBLISHED_ALL_COMMAND:
-                    executeAllPublishedCommand(update.getMessage());
-                    break;
-                case PUBLISHED_MY_COMMAND:
-                    executeMyPublishedCommand(update.getMessage());
-                    break;
-                default:
-                    sendMessage(chatId, COMMAND_NOT_SUPPORTED_MESSAGE);
+            if (!isAuthInBot(message.getChatId()) && !message.getText().equals(START_COMMAND)) {
+                sendMessage(message.getChatId(), NO_AUTH_MESSAGE);
+                log.info("Unauthorized user with ID {} attempt to execute \"{}\" command",
+                        message.getChatId(),
+                        message.getText()
+                );
+            } else {
+                executeCommand(message);
             }
         }
     }
@@ -88,14 +76,38 @@ public class TelegramBot extends TelegramLongPollingBot {
             TelegramUser user = mayBeUser.get();
             if (user.getNotifyEventPublished()) {
                 sendMessage(chatId, ALREADY_SUBSCRIBED_MESSAGE);
-                log.info("User with telegram ID {} already subscribed to event publishing notification", chatId);
+                log.info("User with telegram ID {} already notified about publication new events", chatId);
                 return;
             }
             user.setNotifyEventPublished(true);
-            sendMessage(chatId, SUBSCRIBE_EVENT_PUBLISHED_MESSAGE);
+            sendMessage(chatId, SUBSCRIBE_NEW_EVENT_PUBLISHED_MESSAGE);
             log.info("User with telegram ID {} subscribed to event publishing notification", chatId);
         } else {
             sendMessage(chatId, NO_AUTH_MESSAGE);
+        }
+    }
+
+    private void executeCommand(Message message) {
+        long chatId = message.getChatId();
+        switch (message.getText()) {
+            case START_COMMAND:
+                executeStart(message);
+                break;
+            case HELP_COMMAND:
+                if (isAuthInApp(chatId)) {
+                    sendMessage(chatId, getHelpAuthMsg());
+                } else {
+                    sendMessage(chatId, getHelpMsg());
+                }
+                break;
+            case PUBLISHED_ALL_COMMAND:
+                executeAllPublishedCommand(message);
+                break;
+            case PUBLISHED_MY_COMMAND:
+                executeMyPublishedCommand(message);
+                break;
+            default:
+                sendMessage(chatId, COMMAND_NOT_SUPPORTED_MESSAGE);
         }
     }
 
@@ -110,7 +122,21 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private void executeMyPublishedCommand(Message message) {
-        throw new RuntimeException("not impl");
+        long chatId = message.getChatId();
+        Optional<TelegramUser> mayBeUser = repo.findById(chatId);
+        if (mayBeUser.isPresent()) {
+            TelegramUser user = mayBeUser.get();
+            if (user.getNotifyMyEventPublished()) {
+                sendMessage(chatId, ALREADY_SUBSCRIBED_MESSAGE);
+                log.info("User with telegram ID {} already notified about publication of his events", chatId);
+                return;
+            }
+            user.setNotifyMyEventPublished(true);
+            sendMessage(chatId, SUBSCRIBE_MY_EVENT_PUBLISHED_MESSAGE);
+            log.info("User with telegram ID {} subscribed to notification about publication his events", chatId);
+        } else {
+            sendMessage(chatId, NO_AUTH_MESSAGE);
+        }
     }
 
     private void executeStart(Message message) {
@@ -141,7 +167,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     private boolean registerUser(Message message) {
-        if (isAuthInBot(message.getChatId())) {
+        if (!isAuthInBot(message.getChatId())) {
             TelegramUser user = mapper.mapToUser(message.getFrom());
             repo.save(user);
             log.info("User with ID {} saved", user.getTelegramId());
