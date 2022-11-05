@@ -110,6 +110,7 @@ public class EventService {
         couldBePublishedOrThrow(event);
         publish(event);
         updateViews(event);
+        notificationService.eventPublished(event);
         return mapper.entityToFullDto(event);
     }
 
@@ -117,8 +118,8 @@ public class EventService {
         Event event = getEventOrThrow(id);
         couldBeRejectOrThrow(event);
         reject(event);
-        notificationService.eventCanceled(event);
         updateViews(event);
+        notificationService.eventCanceled(event);
         return mapper.entityToFullDto(event);
     }
 

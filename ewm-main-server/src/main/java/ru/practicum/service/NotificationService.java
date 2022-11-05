@@ -6,9 +6,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EventAction;
 import ru.practicum.dto.EventNotification;
+import ru.practicum.dto.RequestAction;
+import ru.practicum.dto.RequestNotification;
 import ru.practicum.entity.Event;
 import ru.practicum.entity.ParticipationRequest;
 import ru.practicum.mapper.EventNotificationMapper;
+import ru.practicum.mapper.RequestNotificationMapper;
 import ru.practicum.model.EventState;
 import ru.practicum.repository.EventRepository;
 import ru.practicum.client.NotificationClient;
@@ -28,30 +31,39 @@ public class NotificationService {
     private final NotificationClient client;
     private final EventRepository eventRepo;
     private final RequestRepository requestRepo;
-    private final EventNotificationMapper mapper;
+    private final EventNotificationMapper eventMapper;
+    private final RequestNotificationMapper requestMapper;
     private final Duration scheduleDelay = Duration.ofMillis(SCHEDULE_DELAY);
     private final Duration eventNotifyPeriod = Duration.ofDays(1);
 
     public void eventCanceled(Event event) {
-        EventNotification notification = mapper.eventToNotification(event);
+        EventNotification notification = eventMapper.eventToNotification(event);
         notification.setAction(EventAction.CANCELED);
         client.sendEvent(notification);
     }
 
     public void eventPublished(Event event) {
-
+        EventNotification notification = eventMapper.eventToNotification(event);
+        notification.setAction(EventAction.PUBLISHED);
+        client.sendEvent(notification);
     }
 
     public void requestConfirmed(ParticipationRequest request) {
-
+        RequestNotification notification = requestMapper.requestToNotification(request);
+        notification.setAction(RequestAction.CONFIRMED);
+        client.sendRequest(notification);
     }
 
     public void requestCreated(ParticipationRequest request) {
-
+        RequestNotification notification = requestMapper.requestToNotification(request);
+        notification.setAction(RequestAction.CREATED);
+        client.sendRequest(notification);
     }
 
     public void requestRejected(ParticipationRequest request) {
-
+        RequestNotification notification = requestMapper.requestToNotification(request);
+        notification.setAction(RequestAction.REJECTED);
+        client.sendRequest(notification);
     }
 
     @Scheduled(fixedDelay = SCHEDULE_DELAY)
@@ -70,7 +82,7 @@ public class NotificationService {
         LocalDateTime to = from.plus(scheduleDelay);
         List<Event> events = eventRepo.findAllByStateAndEventDateIsBetween(EventState.PUBLISHED, from, to);
         return events.stream()
-                .map(mapper::eventToNotification)
+                .map(eventMapper::eventToNotification)
                 .peek(eventNotification -> eventNotification.setAction(EventAction.INCOMING_INITIATOR))
                 .collect(Collectors.toList());
     }
@@ -88,7 +100,7 @@ public class NotificationService {
                 notifications.get(eventId).getParticipantsIds().add(requesterId);
             } else {
                 Event event = request.getEvent();
-                EventNotification notification = mapper.eventToNotification(event);
+                EventNotification notification = eventMapper.eventToNotification(event);
                 notification.setAction(EventAction.INCOMING_REQUESTER);
                 List<Long> participantsIds = new ArrayList<>();
                 participantsIds.add(requesterId);
