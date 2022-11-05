@@ -29,6 +29,12 @@ public class TelegramUser {
     private LocalDateTime registeredAt = LocalDateTime.now();
     @Column(name = "notify_event_published", nullable = false)
     private Boolean notifyEventPublished = false;
-    @Column(name = "notify_my_event_published", nullable = false)
-    private Boolean notifyMyEventPublished = false;
+    @Column(name = "notify_my_event", nullable = false)
+    private Boolean notifyMyEvent = false;
+    @Column(name = "notify_incoming_event", nullable = false)
+    private Boolean notifyIncoming = false;
+    @Column(name = "notify_my_participation", nullable = false)
+    private Boolean participationMy = false;
+    @Column(name = "notify_participation_request", nullable = true)
+    private Boolean participationRequest = false;
 }

@@ -6,5 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     last_name VARCHAR,
     registered_at TIMESTAMP WITHOUT TIME ZONE,
     notify_event_published BOOLEAN DEFAULT FALSE NOT NULL,
-    notify_my_event_published BOOLEAN DEFAULT FALSE NOT NULL
+    notify_my_event BOOLEAN DEFAULT FALSE NOT NULL,
+    notify_incoming_event BOOLEAN DEFAULT FALSE NOT NULL,
+    notify_my_participation BOOLEAN DEFAULT FALSE NOT NULL,
+    notify_participation_request BOOLEAN DEFAULT FALSE NOT NULL
 );
