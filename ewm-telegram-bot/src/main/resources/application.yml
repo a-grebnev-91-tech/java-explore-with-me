@@ -26,17 +26,6 @@ spring:
   config:
     activate:
       on-profile: dev
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        format_sql: true
-    hibernate:
-      ddl-auto: none
-    show-sql: true
-  sql:
-    init:
-      mode: always
   datasource:
     driverClassName: org.h2.Driver
     url: jdbc:h2:file:./db/telegram_users

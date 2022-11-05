@@ -3,6 +3,7 @@ package ru.practicum.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -48,6 +49,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
     @Override
+    @Transactional
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
             Message message = update.getMessage();
@@ -141,6 +143,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 return ALREADY_SUBSCRIBED_MESSAGE;
             }
             user.setNotifyEventPublished(true);
+            repo.save(user);
             log.info("User with telegram ID {} subscribed to event publishing notification", chatId);
             return SUBSCRIBE_NEW_EVENT_PUBLISHED_MESSAGE;
         } else {
@@ -160,6 +163,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     return ALREADY_SUBSCRIBED_MESSAGE;
                 }
                 user.setNotifyIncoming(true);
+                repo.save(user);
                 log.info("User with telegram ID {} subscribed to notification about incoming events", chatId);
                 return SUBSCRIBE_INCOMING_EVEN_MESSAGE;
             } else {
@@ -183,6 +187,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     return ALREADY_SUBSCRIBED_MESSAGE;
                 }
                 user.setNotifyMyEvent(true);
+                repo.save(user);
                 log.info("User with telegram ID {} subscribed to notification about publication his events", chatId);
                 return SUBSCRIBE_MY_EVENT_PUBLISHED_MESSAGE;
             } else {
@@ -206,6 +211,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     return ALREADY_SUBSCRIBED_MESSAGE;
                 }
                 user.setParticipationMy(true);
+                repo.save(user);
                 log.info("User with telegram ID {} subscribed to notification about his participation requests", chatId);
                 return SUBSCRIBE_PARTICIPATION_MY_MESSAGE;
             } else {
@@ -229,6 +235,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                     return ALREADY_SUBSCRIBED_MESSAGE;
                 }
                 user.setParticipationRequest(true);
+                repo.save(user);
                 log.info("User with telegram ID {} subscribed to notification about new requests for his events",
                         chatId);
                 return SUBSCRIBE_PARTICIPATION_REQUEST_MESSAGE;
