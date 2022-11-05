@@ -10,4 +10,6 @@ public interface BotRepository extends JpaRepository<TelegramUser, Long> {
     Optional<TelegramUser> findByEwmId(long id);
 
     List<TelegramUser> findAllByNotifyEventPublished(boolean notifyEventPublished);
+
+    List<TelegramUser> findAllByEwmIdIn(List<Long> participantsIds);
 }
