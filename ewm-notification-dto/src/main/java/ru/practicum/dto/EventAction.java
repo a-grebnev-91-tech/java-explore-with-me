@@ -1,7 +1,8 @@
 package ru.practicum.dto;
 
 public enum EventAction {
-    INCOMING,
+    INCOMING_INITIATOR,
+    INCOMING_REQUESTER,
     PUBLISHED,
     CANCELED
 }

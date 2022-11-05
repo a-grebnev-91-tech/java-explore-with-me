@@ -8,7 +8,7 @@ import ru.practicum.entity.ParticipationRequest;
 import java.util.List;
 import java.util.Optional;
 
-public interface RequestRepository extends JpaRepository<ParticipationRequest, Long> {
+public interface RequestRepository extends JpaRepository<ParticipationRequest, Long>, RequestRepositoryQueryDsl {
     List<ParticipationRequest> findAllByEventId(long eventId);
 
     List<ParticipationRequest> findAllByRequesterId(long userId);

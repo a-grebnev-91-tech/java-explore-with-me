@@ -22,13 +22,24 @@ spring:
 
 ---
 
+#spring:
+#  config:
+#    activate:
+#      on-profile: dev
+#  datasource:
+#    driverClassName: org.h2.Driver
+#    url: jdbc:h2:file:./db/telegram_users
+#    username: root
+#    password: root
+#server:
+#  port: 7070
+
 spring:
   config:
     activate:
       on-profile: dev
   datasource:
-    driverClassName: org.h2.Driver
-    url: jdbc:h2:file:./db/telegram_users
+    url: jdbc:postgresql:http://localhost:5432/telegram_users
     username: root
     password: root
 server:

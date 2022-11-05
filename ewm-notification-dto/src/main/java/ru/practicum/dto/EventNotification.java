@@ -2,26 +2,30 @@ package ru.practicum.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
-@RequiredArgsConstructor
+@Setter
 public class EventNotification {
     @NotNull
-    private final long eventId;
+    private long eventId;
     @NotNull
-    private final String title;
+    private String title;
     @NotNull
-    private final String annotation;
+    private String annotation;
     @NotNull
-    private final long initiatorId;
+    private long initiatorId;
     @NotNull
-    private final String initiatorName;
+    private String initiatorName;
     @NotNull
-    private final LocalDateTime eventDate;
+    private LocalDateTime eventDate;
+    private List<Long> participantsIds = new ArrayList<>();
     @NotNull
-    private final EventAction action;
+    private EventAction action;
 }

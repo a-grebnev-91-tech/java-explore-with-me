@@ -5,6 +5,7 @@ import ru.practicum.entity.Event;
 import ru.practicum.model.EventState;
 import ru.practicum.util.OffsetPageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,4 +15,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
     List<Event> findByInitiatorId(long initiatorId, OffsetPageable pageable);
 
     boolean existsByCategoryId(long categoryId);
+
+    List<Event> findAllByStateAndEventDateIsBetween(EventState state, LocalDateTime from, LocalDateTime to);
 }

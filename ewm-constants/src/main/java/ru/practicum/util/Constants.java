@@ -8,4 +8,5 @@ public class Constants {
     public static final String STATS_API_PREFIX = "/stats";
     public static final String EVENT_NOTIFICATION_API_PREFIX = "/events";
     public static final String REQUEST_NOTIFICATION_API_PREFIX = "/requests";
+    public static final long SCHEDULE_DELAY = 300_000L;
 }
