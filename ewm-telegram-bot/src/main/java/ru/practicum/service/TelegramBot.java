@@ -72,11 +72,16 @@ public class TelegramBot extends TelegramLongPollingBot {
                 return getStartCommandMessage(message.getFrom().getFirstName(), isNew);
             case HELP:
                 return getHelpMsg(message);
-            case EVENT_ALL_PUBLISH:
-                return executeAllPublishedCommand(message);
-            case EVENT_MY_PUBLISH:
-                return executeMyPublishedCommand(message);
+            case EVENT_ALL:
+                return handleAllPublish(message);
+            case EVENT_MY:
+                return handleMyPublish(message);
+            case PARTICIPATION_REQUEST:
+                return handleParticipationRequest(message);
+            case PARTICIPATION_MY:
+                return handleParticipationMy(message);
         }
+        return "";
     }
 
     private String performUnauthInBotCommand(Message message) {
@@ -104,7 +109,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         return executeMessage(message);
     }
 
-    private String executeAllPublishedCommand(Message message) {
+    private String handleAllPublish(Message message) {
         long chatId = message.getChatId();
         Optional<TelegramUser> mayBeUser = repo.findById(chatId);
         if (mayBeUser.isPresent()) {
@@ -131,7 +136,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
     }
 
-    private String executeMyPublishedCommand(Message message) {
+    private String handleMyPublish(Message message) {
         long chatId = message.getChatId();
         Optional<TelegramUser> mayBeUser = repo.findById(chatId);
         if (mayBeUser.isPresent()) {

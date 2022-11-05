@@ -8,12 +8,12 @@ import java.util.List;
 public enum Command {
     START("/start"),
     HELP("/help"),
-    EVENT_ALL_PUBLISH("/publish"),
-    EVENT_MY_PUBLISH("/publishmy"),
+    EVENT_ALL("/publish"),
+    EVENT_MY("/publishmy"),
     EVENT_MY_REJECT("/eventreject"),
     PARTICIPATION_REQUEST("/requestmyevent"),
     PARTICIPATION_REJECT("/requestreject"),
-    PARTICIPATION_CONFIRM("/requestconfirm");
+    PARTICIPATION_MY("/requestconfirm");
 
     private final String command;
 
@@ -23,7 +23,7 @@ public enum Command {
 
     public boolean isPrivate() {
         List<Command> privateCommands = List.of(
-                EVENT_MY_PUBLISH, EVENT_MY_REJECT, PARTICIPATION_REJECT, PARTICIPATION_CONFIRM, PARTICIPATION_REQUEST
+                EVENT_MY, EVENT_MY_REJECT, PARTICIPATION_REJECT, PARTICIPATION_MY, PARTICIPATION_REQUEST
         );
         return privateCommands.contains(this);
     }
@@ -42,9 +42,9 @@ public enum Command {
             case "/help":
                 return HELP;
             case "/publish":
-                return EVENT_ALL_PUBLISH;
+                return EVENT_ALL;
             case "/publishmy":
-                return EVENT_MY_PUBLISH;
+                return EVENT_MY;
             case "/eventreject":
                 return EVENT_MY_REJECT;
             case "/requestmyevent":
@@ -52,7 +52,7 @@ public enum Command {
             case "/requestreject":
                 return PARTICIPATION_REJECT;
             case "/requestconfirm":
-                return PARTICIPATION_CONFIRM;
+                return PARTICIPATION_MY;
             default:
                 throw new IllegalArgumentException();
         }
