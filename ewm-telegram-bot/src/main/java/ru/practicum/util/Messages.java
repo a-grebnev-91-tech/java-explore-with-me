@@ -1,7 +1,5 @@
 package ru.practicum.util;
 
-import static ru.practicum.util.Commands.START_COMMAND;
-
 public class Messages {
     public static final String ALREADY_SUBSCRIBED_MESSAGE = "Похоже вы уже подписаны на это оповещение";
     public static final String AVAILABLE_COMMANDS_MESSAGE = "Для вас доступны следующие команды:\n";
@@ -20,7 +18,7 @@ public class Messages {
 
     public static final String COMMAND_NOT_SUPPORTED_MESSAGE = "Извините, такая команда не поддерживается!";
     public static final String NO_AUTH_MESSAGE = "Извините, похоже вы не авторизованы. Для авторизации воспользуйтесь" +
-            " командой: " + START_COMMAND;
+            " командой: " + Command.START.getCommand();
     public static final String NO_AUTH_EWM_APP_MESSAGE = "Извините, похоже вы не авторизованы, в приложении " +
             " \"Explore With Me!\". Для авторизации воспользуйтесь официальным сайтом приложения";
     public static final String SUBSCRIBE_NEW_EVENT_PUBLISHED_MESSAGE = "Теперь вы будете получать уведомления " +
