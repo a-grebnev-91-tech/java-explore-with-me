@@ -52,7 +52,17 @@ public class BotService {
     }
 
     private void sendEventCanceled(EventNotification dto) {
-        throw new RuntimeException("not impl");
+        Optional<TelegramUser> maybeInitiator = repo.findByEwmId(dto.getInitiatorId());
+        if (maybeInitiator.isPresent()) {
+            TelegramUser initiator = maybeInitiator.get();
+            if (initiator.getNotifyMyEvent()) {
+                bot.sendMessage(initiator.getTelegramId(), prepareCanceledText(dto));
+            } else {
+                log.info("User with ID {} isn't subscribed to this notifications", initiator.getTelegramId());
+            }
+        } else {
+            log.info("User with ewm ID {} isn't sign in in bot", dto.getInitiatorId());
+        }
     }
 
     private void sendEventIncomingToInitiator(EventNotification dto) {
@@ -100,6 +110,15 @@ public class BotService {
         }
     }
 
+    private String prepareCanceledText(EventNotification event) {
+        StringBuilder builder = new StringBuilder("Ваше событие ")
+                .append(event.getTitle()).append(" под номером ").append(event.getEventId())
+                .append(", которое было запланировано на ")
+                .append(event.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
+                .append(", отменено.");
+        return builder.toString();
+    }
+
     private String prepareEventPublishedInitiatorText(EventNotification event) {
         StringBuilder builder = new StringBuilder("Ваше событие ")
                 .append(event.getTitle()).append(" под номером ").append(event.getEventId())
@@ -119,6 +138,7 @@ public class BotService {
                 .append(", которое будет проходить ")
                 .append(dto.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
                 .append(" состоится уже через сутки!");
+        return builder.toString();
     }
 
     private String prepareIncomingToParticipationText(EventNotification dto) {
@@ -127,5 +147,6 @@ public class BotService {
                 .append(", которое будет проходить ")
                 .append(dto.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
                 .append(" и в котором вы планируете принять участие состоится уже через час!");
+        return builder.toString();
     }
 }

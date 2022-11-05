@@ -33,7 +33,9 @@ public class NotificationService {
     private final Duration eventNotifyPeriod = Duration.ofDays(1);
 
     public void eventCanceled(Event event) {
-
+        EventNotification notification = mapper.eventToNotification(event);
+        notification.setAction(EventAction.CANCELED);
+        client.sendEvent(notification);
     }
 
     public void eventPublished(Event event) {

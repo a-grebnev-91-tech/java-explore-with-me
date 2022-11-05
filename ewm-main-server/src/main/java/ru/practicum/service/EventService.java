@@ -35,6 +35,7 @@ public class EventService {
     private final EventRepository eventRepo;
     private final UserRepository userRepo;
     private final StatsClient statsClient;
+    private final NotificationService notificationService;
     private final EventMapper mapper;
     private final Patcher patcher;
 
@@ -116,6 +117,7 @@ public class EventService {
         Event event = getEventOrThrow(id);
         couldBeRejectOrThrow(event);
         reject(event);
+        notificationService.eventCanceled(event);
         updateViews(event);
         return mapper.entityToFullDto(event);
     }
