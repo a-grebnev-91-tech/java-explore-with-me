@@ -138,7 +138,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         Optional<TelegramUser> mayBeUser = repo.findById(chatId);
         if (mayBeUser.isPresent()) {
             TelegramUser user = mayBeUser.get();
-            if (user.getNotifyEventPublished()) {
+            if (user.isNotifyEventPublished()) {
                 log.info("User with telegram ID {} already notified about publication new events", chatId);
                 return ALREADY_SUBSCRIBED_MESSAGE;
             }
@@ -158,7 +158,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (mayBeUser.isPresent()) {
             TelegramUser user = mayBeUser.get();
             if (user.getEwmId() != null) {
-                if (user.getNotifyIncoming()) {
+                if (user.isNotifyIncoming()) {
                     log.info("User with telegram ID {} already notified about incoming events", chatId);
                     return ALREADY_SUBSCRIBED_MESSAGE;
                 }
@@ -182,7 +182,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (mayBeUser.isPresent()) {
             TelegramUser user = mayBeUser.get();
             if (user.getEwmId() != null) {
-                if (user.getNotifyMyEvent()) {
+                if (user.isNotifyMyEvent()) {
                     log.info("User with telegram ID {} already notified about publication of his events", chatId);
                     return ALREADY_SUBSCRIBED_MESSAGE;
                 }
@@ -206,7 +206,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (mayBeUser.isPresent()) {
             TelegramUser user = mayBeUser.get();
             if (user.getEwmId() != null) {
-                if (user.getParticipationMy()) {
+                if (user.isParticipationMy()) {
                     log.info("User with telegram ID {} already notified about his participation requests", chatId);
                     return ALREADY_SUBSCRIBED_MESSAGE;
                 }
@@ -230,7 +230,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (mayBeUser.isPresent()) {
             TelegramUser user = mayBeUser.get();
             if (user.getEwmId() != null) {
-                if (user.getParticipationRequest()) {
+                if (user.isParticipationRequest()) {
                     log.info("User with telegram ID {} already notified about new requests for his events", chatId);
                     return ALREADY_SUBSCRIBED_MESSAGE;
                 }

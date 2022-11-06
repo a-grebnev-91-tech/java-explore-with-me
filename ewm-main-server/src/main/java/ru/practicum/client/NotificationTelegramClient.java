@@ -38,7 +38,7 @@ public class NotificationTelegramClient implements NotificationClient {
 
     @Override
     public void sendRequest(RequestNotification dto) {
-        log.info("Sending request notification for request with ID {}", dto.getId());
+        log.info("Sending request notification for request with ID {}", dto.getRequestId());
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<RequestNotification> httpEntity = new HttpEntity<>(dto, headers);

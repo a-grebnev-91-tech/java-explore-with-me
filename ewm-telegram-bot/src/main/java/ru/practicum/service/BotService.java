@@ -72,6 +72,7 @@ public class BotService {
         }
     }
 
+    //todo`
     public void sendRequestNotification(RequestNotification dto) {
         throw new RuntimeException("not impl");
     }
@@ -80,7 +81,7 @@ public class BotService {
         Optional<TelegramUser> maybeInitiator = repo.findByEwmId(dto.getInitiatorId());
         if (maybeInitiator.isPresent()) {
             TelegramUser initiator = maybeInitiator.get();
-            if (initiator.getNotifyMyEvent()) {
+            if (initiator.isNotifyMyEvent()) {
                 bot.sendMessage(initiator.getTelegramId(), prepareCanceledText(dto));
             } else {
                 log.info("User with ID {} isn't subscribed to this notifications", initiator.getTelegramId());
@@ -94,7 +95,7 @@ public class BotService {
         Optional<TelegramUser> maybeInitiator = repo.findByEwmId(dto.getInitiatorId());
         if (maybeInitiator.isPresent()) {
             TelegramUser initiator = maybeInitiator.get();
-            if (initiator.getNotifyMyEvent()) {
+            if (initiator.isNotifyMyEvent()) {
                 bot.sendMessage(initiator.getTelegramId(), prepareIncomingToInitiatorText(dto));
             } else {
                 log.info("User with ID {} isn't subscribed to this notifications", initiator.getTelegramId());
@@ -108,7 +109,7 @@ public class BotService {
         List<TelegramUser> usersToNotify = repo.findAllByEwmIdIn(dto.getParticipantsIds());
         String text = prepareIncomingToParticipationText(dto);
         for (TelegramUser participation : usersToNotify) {
-            if (participation.getNotifyIncoming()) {
+            if (participation.isNotifyIncoming()) {
                 bot.sendMessage(participation.getTelegramId(), text);
             } else {
                 log.info("User with ID {} isn't subscribed to this notifications", participation.getTelegramId());
@@ -136,42 +137,39 @@ public class BotService {
     }
 
     private String prepareCanceledText(EventNotification event) {
-        StringBuilder builder = new StringBuilder("Ваше событие ")
-                .append(event.getTitle()).append(" под номером ").append(event.getEventId())
-                .append(", которое было запланировано на ")
-                .append(event.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
-                .append(", отменено.");
-        return builder.toString();
+        return "Ваше событие " +
+                event.getTitle() + " под номером " + event.getEventId() +
+                ", которое было запланировано на " +
+                event.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)) +
+                ", отменено.";
     }
 
     private String prepareEventPublishedInitiatorText(EventNotification event) {
-        StringBuilder builder = new StringBuilder("Ваше событие ")
-                .append(event.getTitle()).append(" под номером ").append(event.getEventId())
-                .append(", которое будет проходить ")
-                .append(event.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
-                .append(", одобрено и опубликованно администратором");
-        return builder.toString();
+        return "Ваше событие " +
+                event.getTitle() + " под номером " + event.getEventId() +
+                ", которое будет проходить " +
+                event.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)) +
+                ", одобрено и опубликованно администратором";
     }
 
-    private String prepareEventPublishedText(EventNotification dto) {
-        return null;
+    private String prepareEventPublishedText(EventNotification event) {
+        return "Опубликовано новое событие!\n\"" + event.getTitle() + "\" которое будет проходить "
+                + event.getEventDate() + ".\nСпешите принять участие!";
     }
 
     private String prepareIncomingToInitiatorText(EventNotification dto) {
-        StringBuilder builder = new StringBuilder("Ваше событие ")
-                .append(dto.getTitle()).append(" под номером ").append(dto.getEventId())
-                .append(", которое будет проходить ")
-                .append(dto.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
-                .append(" состоится уже через сутки!");
-        return builder.toString();
+        return "Ваше событие " +
+                dto.getTitle() + " под номером " + dto.getEventId() +
+                ", которое будет проходить " +
+                dto.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)) +
+                " состоится уже через сутки!";
     }
 
     private String prepareIncomingToParticipationText(EventNotification dto) {
-        StringBuilder builder = new StringBuilder("Событие ")
-                .append(dto.getTitle()).append(" под номером ").append(dto.getEventId())
-                .append(", которое будет проходить ")
-                .append(dto.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
-                .append(" и в котором вы планируете принять участие состоится уже через час!");
-        return builder.toString();
+        return "Событие " +
+                dto.getTitle() + " под номером " + dto.getEventId() +
+                ", которое будет проходить " +
+                dto.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)) +
+                " и в котором вы планируете принять участие состоится уже через час!";
     }
 }

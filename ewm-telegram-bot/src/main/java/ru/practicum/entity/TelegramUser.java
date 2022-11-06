@@ -28,13 +28,13 @@ public class TelegramUser {
     @Column(name = "registered_at")
     private LocalDateTime registeredAt = LocalDateTime.now();
     @Column(name = "notify_event_published", nullable = false)
-    private Boolean notifyEventPublished;
+    private boolean notifyEventPublished = false;
     @Column(name = "notify_my_event", nullable = false)
-    private Boolean notifyMyEvent;
+    private boolean notifyMyEvent = false;
     @Column(name = "notify_incoming_event", nullable = false)
-    private Boolean notifyIncoming;
+    private boolean notifyIncoming = false;
     @Column(name = "notify_my_participation", nullable = false)
-    private Boolean participationMy;
+    private boolean participationMy = false;
     @Column(name = "notify_participation_request", nullable = false)
-    private Boolean participationRequest;
+    private boolean participationRequest = false;
 }
