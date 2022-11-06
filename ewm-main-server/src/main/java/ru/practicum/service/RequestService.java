@@ -43,7 +43,9 @@ public class RequestService {
         ParticipationRequest request = createRequest(event, user);
         log.info("Create request for event with ID {} from user with ID {}", eventId, userId);
         request = requestRepo.save(request);
-        notificationService.requestCreated(request);
+        if (request.getStatus().equals(RequestStatus.PENDING)) {
+            notificationService.requestCreated(request);
+        }
         return mapper.entityToDto(request);
     }
 

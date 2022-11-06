@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.dto.EventNotification;
+import ru.practicum.dto.RequestAction;
 import ru.practicum.dto.RequestNotification;
 import ru.practicum.entity.TelegramUser;
 import ru.practicum.exception.NotFoundException;
@@ -72,9 +73,16 @@ public class BotService {
         }
     }
 
-    //todo`
     public void sendRequestNotification(RequestNotification dto) {
-        throw new RuntimeException("not impl");
+        switch (dto.getAction()) {
+            case CREATED:
+                sendRequestCreated(dto);
+                break;
+            case CONFIRMED:
+            case REJECTED:
+                sendRequestStatusChanged(dto);
+                break;
+        }
     }
 
     private void sendEventCanceled(EventNotification dto) {
@@ -117,7 +125,6 @@ public class BotService {
         }
     }
 
-
     private void sendEventPublishedForAllUsers(EventNotification dto) {
         List<TelegramUser> usersToNotify = repo.findAllByNotifyEventPublished(true);
         String textForAll = prepareEventPublishedText(dto);
@@ -132,7 +139,55 @@ public class BotService {
         if (initiator.isPresent()) {
             String textForInitiator = prepareEventPublishedInitiatorText(dto);
             if (bot.sendMessage(initiator.get().getTelegramId(), textForInitiator))
-                log.info("Notification for initiator has been sent");
+                log.info("Notification for initiator with ID {} has been sent", dto.getInitiatorId());
+        }
+    }
+
+    private void sendRequestStatusChanged(RequestNotification request) {
+        Optional<TelegramUser> maybeRequester = repo.findByEwmId(request.getRequesterId());
+        if (maybeRequester.isPresent()) {
+            TelegramUser requester = maybeRequester.get();
+            if (requester.isParticipationMy()) {
+                String textForRequester;
+                if (request.getAction().equals(RequestAction.CONFIRMED)) {
+                    textForRequester = prepareRequestConfirmedText(request);
+                } else {
+                    textForRequester = prepareRequestRejectedText(request);
+                }
+                if (bot.sendMessage(requester.getTelegramId(), textForRequester)) {
+                    log.info("Notification for initiator with ID {} has been sent", requester.getTelegramId());
+                }
+            } else {
+                log.info("User with ID {} isn't subscribed to this notifications", request.getRequesterId());
+            }
+        } else {
+            log.info("User with EWM ID {} isn't logged into the bot", request.getRequesterId());
+        }
+    }
+
+    private String prepareRequestRejectedText(RequestNotification request) {
+        return "Ваша заявка на участие в событии " + request.getEventTitle() + " отклонена организатором события, " +
+                "либо в виду того, что закончились свободные места.";
+    }
+
+    private String prepareRequestConfirmedText(RequestNotification request) {
+        return "Ваша заявка на участие в событии " + request.getEventTitle() + " подтверждена организатором события!";
+    }
+
+    private void sendRequestCreated(RequestNotification request) {
+        Optional<TelegramUser> maybeInitiator = repo.findByEwmId(request.getEventInitiatorId());
+        if (maybeInitiator.isPresent()) {
+            TelegramUser initiator = maybeInitiator.get();
+            if (initiator.isParticipationRequest()) {
+                String textForInitiator = prepareRequestCreatedText(request);
+                if (bot.sendMessage(initiator.getTelegramId(), textForInitiator)) {
+                    log.info("Notification for initiator with ID {} has been sent", initiator.getTelegramId());
+                }
+            } else {
+                log.info("User with ID {} isn't subscribed to this notifications", request.getEventInitiatorId());
+            }
+        } else {
+            log.info("User with EWM ID {} isn't logged into the bot", request.getEventInitiatorId());
         }
     }
 
@@ -171,5 +226,11 @@ public class BotService {
                 ", которое будет проходить " +
                 dto.getEventDate().format(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)) +
                 " и в котором вы планируете принять участие состоится уже через час!";
+    }
+
+    private String prepareRequestCreatedText(RequestNotification request) {
+        return "Пользователь " + request.getRequesterName() + " создал заявку на участие в вашем событии \"" +
+                request.getEventTitle() + "\", с номером " + request.getEventId() + ".\n" +
+                request.getRequesterName() + " ждет одобрения своей заявки!";
     }
 }

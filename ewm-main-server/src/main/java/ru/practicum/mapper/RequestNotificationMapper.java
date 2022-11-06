@@ -12,6 +12,7 @@ public interface RequestNotificationMapper {
     @Mapping(source = "request.event.title", target = "eventTitle")
     @Mapping(source = "request.event.annotation", target = "eventAnnotation")
     @Mapping(source = "request.requester.id", target = "requesterId")
+    @Mapping(source = "request.requester.name", target = "requesterName")
     @Mapping(source = "request.event.initiator.id", target = "eventInitiatorId")
     RequestNotification requestToNotification(ParticipationRequest request);
 }
