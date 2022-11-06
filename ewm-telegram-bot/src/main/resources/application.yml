@@ -1,7 +1,7 @@
 server:
   port: ${TELEGRAM_BOT_PORT}
 bot:
-  name: ExploreWithMeBot
+  name: ${EXPLORE_WITH_ME_BOT_NAME}
   token: ${EXPLORE_WITH_ME_BOT_TOKEN}
 spring:
   jpa:
@@ -21,18 +21,6 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
 
 ---
-
-#spring:
-#  config:
-#    activate:
-#      on-profile: dev
-#  datasource:
-#    driverClassName: org.h2.Driver
-#    url: jdbc:h2:file:./db/telegram_users
-#    username: root
-#    password: root
-#server:
-#  port: 7070
 
 spring:
   config:
