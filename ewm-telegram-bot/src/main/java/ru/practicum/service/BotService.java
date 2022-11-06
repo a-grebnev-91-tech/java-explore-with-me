@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.dto.EventNotification;
 import ru.practicum.dto.RequestNotification;
 import ru.practicum.entity.TelegramUser;
+import ru.practicum.exception.NotFoundException;
 import ru.practicum.repository.BotRepository;
 
 import java.time.format.DateTimeFormatter;
@@ -22,11 +23,35 @@ public class BotService {
     private final BotRepository repo;
 
     public void bindTelegram(long ewmId, long tgId) {
-        throw new RuntimeException("not impl");
+        Optional<TelegramUser> maybeUser = repo.findByEwmId(ewmId);
+        boolean changedTelegram = false;
+        if (maybeUser.isEmpty()) {
+            maybeUser = repo.findById(tgId);
+            changedTelegram = true;
+        }
+        if (maybeUser.isPresent()) {
+            TelegramUser user = maybeUser.get();
+            if (changedTelegram) {
+                repo.delete(user);
+                user.setTelegramId(tgId);
+                repo.save(user);
+            } else {
+                user.setEwmId(ewmId);
+                repo.save(user);
+            }
+        } else {
+            throw new NotFoundException("User not found", String.format("User with telegram ID %d isn't exist", tgId));
+        }
     }
 
     public void deleteTelegram(long ewmId) {
-        throw new RuntimeException("not impl");
+        Optional<TelegramUser> maybeUser = repo.findByEwmId(ewmId);
+        if (maybeUser.isPresent()) {
+            TelegramUser user = maybeUser.get();
+            repo.delete(user);
+        } else {
+            throw new NotFoundException("User not found", String.format("User with ewm ID %d isn't exist", ewmId));
+        }
     }
 
     public void sendEventNotification(EventNotification dto) {
