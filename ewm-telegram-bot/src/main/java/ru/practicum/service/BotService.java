@@ -26,14 +26,14 @@ public class BotService {
 
     public void bindTelegram(long ewmId, long tgId) {
         Optional<TelegramUser> maybeUser = repo.findByEwmId(ewmId);
-        boolean changedTelegram = false;
+        boolean changedTelegramId = true;
         if (maybeUser.isEmpty()) {
             maybeUser = repo.findById(tgId);
-            changedTelegram = true;
+            changedTelegramId = false;
         }
         if (maybeUser.isPresent()) {
             TelegramUser user = maybeUser.get();
-            if (changedTelegram) {
+            if (changedTelegramId) {
                 repo.delete(user);
                 user.setTelegramId(tgId);
                 repo.save(user);

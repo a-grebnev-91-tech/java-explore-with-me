@@ -14,6 +14,6 @@ public class RequestNotification {
     private String eventTitle;
     private String eventAnnotation;
     private Long requesterId;
-    private Long requesterName;
+    private String requesterName;
     private RequestAction action;
 }
