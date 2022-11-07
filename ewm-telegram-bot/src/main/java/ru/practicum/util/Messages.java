@@ -10,11 +10,10 @@ public class Messages {
     public static final String COMMAND_MESSAGE_PUBLISHED_MY
             = " - для получения уведомлений о публикации ваших событий;\n";
     public static final String COMMAND_MESSAGE_INCOMING = " - для получения уведомлений о приближающихся событиях;\n";
-    public static final String COMMAND_MESSAGE_PARTICIPATION_MY = " - для получения уведомлений о новых заявках на " +
-            "участие в событиях, где вы инициатор;\n";
-    public static final String COMMAND_MESSAGE_PARTICIPATION_REQUEST = " - для получения уведомлений о подтверждении " +
+    public static final String COMMAND_MESSAGE_PARTICIPATION_MY = " - для получения уведомлений о подтверждении " +
             "или отклонении ваших заявок на участие.\n";
-
+    public static final String COMMAND_MESSAGE_PARTICIPATION_REQUEST = " - для получения уведомлений о новых заявках на " +
+            "участие в событиях, где вы инициатор;\n";
 
     public static final String COMMAND_NOT_SUPPORTED_MESSAGE = "Извините, такая команда не поддерживается!";
     public static final String NO_AUTH_MESSAGE = "Извините, похоже вы не авторизованы. Для авторизации воспользуйтесь" +
