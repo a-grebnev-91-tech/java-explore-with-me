@@ -74,7 +74,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             case HELP:
                 return getHelpMsg(message.getChatId());
             case EVENT_ALL:
-                return handleAllPublish(message);
+                return handleAllPublished(message);
             case EVENT_MY:
                 return handleMyPublish(message);
             case EVENT_INCOMING:
@@ -133,7 +133,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         return answer.toString();
     }
 
-    private String handleAllPublish(Message message) {
+    private String handleAllPublished(Message message) {
         long chatId = message.getChatId();
         Optional<TelegramUser> mayBeUser = repo.findById(chatId);
         if (mayBeUser.isPresent()) {
