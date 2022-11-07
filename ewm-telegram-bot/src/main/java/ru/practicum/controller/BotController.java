@@ -31,14 +31,14 @@ public class BotController {
     }
 
     @PostMapping(EVENT_NOTIFICATION_API_PREFIX)
-    public void sendEventNotification(@RequestBody @Valid EventNotification dto) {
-        log.info("Received event notification");
-        service.sendEventNotification(dto);
+    public void sendEventNotification(@RequestBody @Valid EventNotification notification) {
+        log.info("Received event notification: {}", notification);
+        service.sendEventNotification(notification);
     }
 
     @PostMapping(REQUEST_NOTIFICATION_API_PREFIX)
-    public void sendRequestNotification(@RequestBody @Valid RequestNotification dto) {
-        log.info("Received request notification");
-        service.sendRequestNotification(dto);
+    public void sendRequestNotification(@RequestBody @Valid RequestNotification notification) {
+        log.info("Received request notification: {}", notification);
+        service.sendRequestNotification(notification);
     }
 }

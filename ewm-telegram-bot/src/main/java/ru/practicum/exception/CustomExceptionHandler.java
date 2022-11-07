@@ -19,6 +19,13 @@ public class CustomExceptionHandler {
         return new ApiError(ex.getMessage(), ex.getReason(), "NOT_FOUND");
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ActionNotSupportedException.class)
+    public ApiError handleActionNotSupported(ActionNotSupportedException ex) {
+        log.warn("Not found exception has occurred. Message: {}; Reason: {}", ex.getMessage(), ex.getReason());
+        return new ApiError(ex.getMessage(), ex.getReason(), "NOT_FOUND");
+    }
+
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({
             ConstraintViolationException.class,

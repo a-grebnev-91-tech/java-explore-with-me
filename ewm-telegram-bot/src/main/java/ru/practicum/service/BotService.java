@@ -7,6 +7,7 @@ import ru.practicum.dto.EventNotification;
 import ru.practicum.dto.RequestAction;
 import ru.practicum.dto.RequestNotification;
 import ru.practicum.entity.TelegramUser;
+import ru.practicum.exception.ActionNotSupportedException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.repository.BotRepository;
 import ru.practicum.util.Command;
@@ -31,59 +32,67 @@ public class BotService {
             maybeUser = repo.findById(tgId);
             changedTelegramId = false;
         }
-        if (maybeUser.isPresent()) {
-            TelegramUser user = maybeUser.get();
-            if (changedTelegramId) {
-                repo.delete(user);
-                user.setTelegramId(tgId);
-                repo.save(user);
-            } else {
-                user.setEwmId(ewmId);
-                repo.save(user);
-            }
-            bot.sendMessage(user.getTelegramId(), prepareAuthWelcomeText());
+        TelegramUser user = maybeUser.orElseThrow(
+                () -> new NotFoundException(
+                        "User not found",
+                        String.format("User with telegram ID %d isn't exist", tgId))
+        );
+        if (changedTelegramId) {
+            repo.delete(user);
+            user.setTelegramId(tgId);
+            repo.save(user);
         } else {
-            throw new NotFoundException("User not found", String.format("User with telegram ID %d isn't exist", tgId));
+            user.setEwmId(ewmId);
+            repo.save(user);
         }
+        bot.sendMessage(user.getTelegramId(), prepareAuthWelcomeText());
     }
 
     public void deleteTelegram(long ewmId) {
         Optional<TelegramUser> maybeUser = repo.findByEwmId(ewmId);
-        if (maybeUser.isPresent()) {
-            TelegramUser user = maybeUser.get();
-            repo.delete(user);
-        } else {
-            throw new NotFoundException("User not found", String.format("User with ewm ID %d isn't exist", ewmId));
-        }
+        TelegramUser user = maybeUser.orElseThrow(
+                () -> new NotFoundException("User not found", String.format("User with ewm ID %d isn't exist", ewmId))
+        );
+        repo.delete(user);
     }
 
-    public void sendEventNotification(EventNotification dto) {
-        switch (dto.getAction()) {
+    public void sendEventNotification(EventNotification eventNotification) {
+        switch (eventNotification.getAction()) {
             case PUBLISHED:
-                sendEventPublishedForInitiator(dto);
-                sendEventPublishedForAllUsers(dto);
+                sendEventPublishedForInitiator(eventNotification);
+                sendEventPublishedForAllUsers(eventNotification);
                 break;
             case INCOMING_REQUESTER:
-                sendEventIncomingToRequesters(dto);
+                sendEventIncomingToRequesters(eventNotification);
                 break;
             case INCOMING_INITIATOR:
-                sendEventIncomingToInitiator(dto);
+                sendEventIncomingToInitiator(eventNotification);
                 break;
             case CANCELED:
-                sendEventCanceled(dto);
+                sendEventCanceled(eventNotification);
                 break;
+            default:
+                throw new ActionNotSupportedException(
+                        "Event action not supported",
+                        "Action " + eventNotification.getAction() + " not supported"
+                );
         }
     }
 
-    public void sendRequestNotification(RequestNotification dto) {
-        switch (dto.getAction()) {
+    public void sendRequestNotification(RequestNotification requestNotification) {
+        switch (requestNotification.getAction()) {
             case CREATED:
-                sendRequestCreated(dto);
+                sendRequestCreated(requestNotification);
                 break;
             case CONFIRMED:
             case REJECTED:
-                sendRequestStatusChanged(dto);
+                sendRequestStatusChanged(requestNotification);
                 break;
+            default:
+                throw new ActionNotSupportedException(
+                        "Request action not supported",
+                        "Action " + requestNotification.getAction() + " not supported"
+                );
         }
     }
 
@@ -151,41 +160,44 @@ public class BotService {
 
     private void sendRequestStatusChanged(RequestNotification request) {
         Optional<TelegramUser> maybeRequester = repo.findByEwmId(request.getRequesterId());
-        if (maybeRequester.isPresent()) {
-            TelegramUser requester = maybeRequester.get();
-            if (requester.isParticipationMy()) {
-                String textForRequester;
-                if (request.getAction().equals(RequestAction.CONFIRMED)) {
-                    textForRequester = prepareRequestConfirmedText(request);
-                } else {
-                    textForRequester = prepareRequestRejectedText(request);
-                }
-                if (bot.sendMessage(requester.getTelegramId(), textForRequester)) {
-                    log.info("Notification for initiator with ID {} has been sent", requester.getTelegramId());
-                }
-            } else {
-                log.info("User with ID {} isn't subscribed to this notifications", request.getRequesterId());
-            }
-        } else {
-            loggedUserNotFound(request.getRequestId());
-        }
+        maybeRequester.ifPresentOrElse(
+                requester -> {
+                    if (requester.isParticipationMy()) {
+                        String textForRequester;
+                        if (request.getAction().equals(RequestAction.CONFIRMED)) {
+                            textForRequester = prepareRequestConfirmedText(request);
+                        } else {
+                            textForRequester = prepareRequestRejectedText(request);
+                        }
+                        if (bot.sendMessage(requester.getTelegramId(), textForRequester)) {
+                            log.info("Notification for initiator with ID {} has been sent", requester.getTelegramId());
+                        }
+                    } else {
+                        log.info("User with ID {} isn't subscribed to this notifications", request.getRequesterId());
+                    }
+                },
+                () -> loggedUserNotFound(request.getRequestId())
+        );
     }
 
     private void sendRequestCreated(RequestNotification request) {
         Optional<TelegramUser> maybeInitiator = repo.findByEwmId(request.getEventInitiatorId());
-        if (maybeInitiator.isPresent()) {
-            TelegramUser initiator = maybeInitiator.get();
-            if (initiator.isParticipationRequest()) {
-                String textForInitiator = prepareRequestCreatedText(request);
-                if (bot.sendMessage(initiator.getTelegramId(), textForInitiator)) {
-                    log.info("Notification for initiator with ID {} has been sent", initiator.getTelegramId());
-                }
-            } else {
-                log.info("User with ID {} isn't subscribed to this notifications", request.getEventInitiatorId());
-            }
-        } else {
-            loggedUserNotFound(request.getEventInitiatorId());
-        }
+        maybeInitiator.ifPresentOrElse(
+                initiator -> {
+                    if (initiator.isParticipationRequest()) {
+                        String textForInitiator = prepareRequestCreatedText(request);
+                        if (bot.sendMessage(initiator.getTelegramId(), textForInitiator)) {
+                            log.info("Notification for initiator with ID {} has been sent", initiator.getTelegramId());
+                        }
+                    } else {
+                        log.info(
+                                "User with ID {} isn't subscribed to this notifications",
+                                request.getEventInitiatorId()
+                        );
+                    }
+                },
+                () -> loggedUserNotFound(request.getEventInitiatorId())
+        );
     }
 
     private String prepareAuthWelcomeText() {

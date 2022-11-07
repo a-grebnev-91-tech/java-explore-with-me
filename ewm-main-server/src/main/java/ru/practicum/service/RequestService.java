@@ -44,7 +44,7 @@ public class RequestService {
         log.info("Create request for event with ID {} from user with ID {}", eventId, userId);
         request = requestRepo.save(request);
         if (request.getStatus().equals(RequestStatus.PENDING)) {
-            notificationService.requestCreated(request);
+            notificationService.requestStateChanged(request);
         }
         return mapper.entityToDto(request);
     }
@@ -71,7 +71,7 @@ public class RequestService {
         checkRequestIsUpdatableOrThrow(request, userId, eventId);
         log.info("Initiator with ID {} confirmed request with ID {} for event with ID {}", userId, reqId, eventId);
         confirm(request);
-        notificationService.requestConfirmed(request);
+        notificationService.requestStateChanged(request);
         return mapper.entityToDto(request);
     }
 
@@ -93,7 +93,7 @@ public class RequestService {
         checkRequestIsUpdatableOrThrow(request, userId, eventId);
         log.info("Initiator with ID {} rejected request with ID {} for event with ID {}", userId, reqId, eventId);
         reject(request);
-        notificationService.requestRejected(request);
+        notificationService.requestStateChanged(request);
         return mapper.entityToDto(request);
     }
 

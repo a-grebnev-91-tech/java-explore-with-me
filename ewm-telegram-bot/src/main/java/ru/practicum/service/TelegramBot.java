@@ -83,8 +83,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                 return handleParticipationRequest(message);
             case PARTICIPATION_MY:
                 return handleParticipationMy(message);
+            default:
+                return COMMAND_NOT_SUPPORTED_MESSAGE;
         }
-        return "";
     }
 
     public boolean sendMessage(long chatId, String textToSend) {

@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static ru.practicum.util.Constants.SCHEDULE_DELAY;
+import static ru.practicum.util.Constants.*;
 
 @Slf4j
 @Service
@@ -33,40 +33,40 @@ public class NotificationService {
     private final RequestRepository requestRepo;
     private final EventNotificationMapper eventMapper;
     private final RequestNotificationMapper requestMapper;
-    private final Duration scheduleDelay = Duration.ofMillis(SCHEDULE_DELAY);
-    private final Duration eventNotifyPeriod = Duration.ofDays(1);
+    private final Duration scheduleDelay = Duration.ofMillis(SCHEDULE_DELAY_IN_MILLIS);
+    private final Duration eventNotifyPeriod = Duration.ofDays(EVENT_NOTIFICATION_PERIOD_IN_DAYS);
+    private final Duration participationNotifyPeriod = Duration.ofHours(PARTICIPATION_NOTIFICATION_PERIOD_IN_HOURS);
 
-    public void eventCanceled(Event event) {
+    public void eventStateChanged(Event event) {
         EventNotification notification = eventMapper.eventToNotification(event);
-        notification.setAction(EventAction.CANCELED);
+        switch (event.getState()) {
+            case PUBLISHED:
+                notification.setAction(EventAction.PUBLISHED);
+                break;
+            case CANCELED:
+                notification.setAction(EventAction.CANCELED);
+                break;
+        }
         client.sendEvent(notification);
     }
 
-    public void eventPublished(Event event) {
-        EventNotification notification = eventMapper.eventToNotification(event);
-        notification.setAction(EventAction.PUBLISHED);
-        client.sendEvent(notification);
-    }
-
-    public void requestConfirmed(ParticipationRequest request) {
+    public void requestStateChanged(ParticipationRequest request) {
         RequestNotification notification = requestMapper.requestToNotification(request);
-        notification.setAction(RequestAction.CONFIRMED);
+        switch (request.getStatus()) {
+            case PENDING:
+                notification.setAction(RequestAction.CREATED);
+                break;
+            case CONFIRMED:
+                notification.setAction(RequestAction.CONFIRMED);
+                break;
+            case REJECTED:
+                notification.setAction(RequestAction.REJECTED);
+                break;
+        }
         client.sendRequest(notification);
     }
 
-    public void requestCreated(ParticipationRequest request) {
-        RequestNotification notification = requestMapper.requestToNotification(request);
-        notification.setAction(RequestAction.CREATED);
-        client.sendRequest(notification);
-    }
-
-    public void requestRejected(ParticipationRequest request) {
-        RequestNotification notification = requestMapper.requestToNotification(request);
-        notification.setAction(RequestAction.REJECTED);
-        client.sendRequest(notification);
-    }
-
-    @Scheduled(fixedDelay = SCHEDULE_DELAY)
+    @Scheduled(fixedDelay = SCHEDULE_DELAY_IN_MILLIS)
     private void incoming() {
         log.info("Checking for incoming events for requesters");
         Collection<EventNotification> dtos = getNotificationsForRequesters();
@@ -88,7 +88,7 @@ public class NotificationService {
     }
 
     private Collection<EventNotification> getNotificationsForRequesters() {
-        LocalDateTime from = LocalDateTime.now();
+        LocalDateTime from = LocalDateTime.now().plus(participationNotifyPeriod);
         LocalDateTime to = from.plus(scheduleDelay);
         List<ParticipationRequest> requestsToNotify = requestRepo.findRequestsToNotify(from, to);
 
