@@ -87,37 +87,41 @@ public class BotService {
         }
     }
 
-    private void sendEventCanceled(EventNotification dto) {
-        Optional<TelegramUser> maybeInitiator = repo.findByEwmId(dto.getInitiatorId());
+    private void loggedUserNotFound(Long ewmId) {
+        log.info("User with ewm ID {} isn't logged into the bot", ewmId);
+    }
+
+    private void sendEventCanceled(EventNotification event) {
+        Optional<TelegramUser> maybeInitiator = repo.findByEwmId(event.getInitiatorId());
         if (maybeInitiator.isPresent()) {
             TelegramUser initiator = maybeInitiator.get();
             if (initiator.isNotifyMyEvent()) {
-                bot.sendMessage(initiator.getTelegramId(), prepareCanceledText(dto));
+                bot.sendMessage(initiator.getTelegramId(), prepareCanceledText(event));
             } else {
                 log.info("User with ID {} isn't subscribed to this notifications", initiator.getTelegramId());
             }
         } else {
-            log.info("User with ewm ID {} isn't sign in in bot", dto.getInitiatorId());
+            loggedUserNotFound(event.getInitiatorId());
         }
     }
 
-    private void sendEventIncomingToInitiator(EventNotification dto) {
-        Optional<TelegramUser> maybeInitiator = repo.findByEwmId(dto.getInitiatorId());
+    private void sendEventIncomingToInitiator(EventNotification event) {
+        Optional<TelegramUser> maybeInitiator = repo.findByEwmId(event.getInitiatorId());
         if (maybeInitiator.isPresent()) {
             TelegramUser initiator = maybeInitiator.get();
             if (initiator.isNotifyMyEvent()) {
-                bot.sendMessage(initiator.getTelegramId(), prepareIncomingToInitiatorText(dto));
+                bot.sendMessage(initiator.getTelegramId(), prepareIncomingToInitiatorText(event));
             } else {
                 log.info("User with ID {} isn't subscribed to this notifications", initiator.getTelegramId());
             }
         } else {
-            log.info("User with ewm ID {} isn't sign in in bot", dto.getInitiatorId());
+            loggedUserNotFound(event.getInitiatorId());
         }
     }
 
-    private void sendEventIncomingToRequesters(EventNotification dto) {
-        List<TelegramUser> usersToNotify = repo.findAllByEwmIdIn(dto.getParticipantsIds());
-        String text = prepareIncomingToParticipationText(dto);
+    private void sendEventIncomingToRequesters(EventNotification event) {
+        List<TelegramUser> usersToNotify = repo.findAllByEwmIdIn(event.getParticipantsIds());
+        String text = prepareIncomingToParticipationText(event);
         for (TelegramUser participation : usersToNotify) {
             if (participation.isNotifyIncoming()) {
                 bot.sendMessage(participation.getTelegramId(), text);
@@ -127,21 +131,21 @@ public class BotService {
         }
     }
 
-    private void sendEventPublishedForAllUsers(EventNotification dto) {
+    private void sendEventPublishedForAllUsers(EventNotification event) {
         List<TelegramUser> usersToNotify = repo.findAllByNotifyEventPublished(true);
-        String textForAll = prepareEventPublishedText(dto);
+        String textForAll = prepareEventPublishedText(event);
         for (TelegramUser user : usersToNotify) {
             if (bot.sendMessage(user.getTelegramId(), textForAll))
                 log.info("Notification for user with ID {} has been sent", user.getEwmId());
         }
     }
 
-    private void sendEventPublishedForInitiator(EventNotification dto) {
-        Optional<TelegramUser> initiator = repo.findByEwmId(dto.getInitiatorId());
+    private void sendEventPublishedForInitiator(EventNotification event) {
+        Optional<TelegramUser> initiator = repo.findByEwmId(event.getInitiatorId());
         if (initiator.isPresent()) {
-            String textForInitiator = prepareEventPublishedInitiatorText(dto);
+            String textForInitiator = prepareEventPublishedInitiatorText(event);
             if (bot.sendMessage(initiator.get().getTelegramId(), textForInitiator))
-                log.info("Notification for initiator with ID {} has been sent", dto.getInitiatorId());
+                log.info("Notification for initiator with ID {} has been sent", event.getInitiatorId());
         }
     }
 
@@ -163,7 +167,7 @@ public class BotService {
                 log.info("User with ID {} isn't subscribed to this notifications", request.getRequesterId());
             }
         } else {
-            log.info("User with EWM ID {} isn't logged into the bot", request.getRequesterId());
+            loggedUserNotFound(request.getRequestId());
         }
     }
 
@@ -180,7 +184,7 @@ public class BotService {
                 log.info("User with ID {} isn't subscribed to this notifications", request.getEventInitiatorId());
             }
         } else {
-            log.info("User with EWM ID {} isn't logged into the bot", request.getEventInitiatorId());
+            loggedUserNotFound(request.getEventInitiatorId());
         }
     }
 
