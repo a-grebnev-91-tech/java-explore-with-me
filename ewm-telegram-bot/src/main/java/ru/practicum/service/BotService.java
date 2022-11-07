@@ -9,6 +9,7 @@ import ru.practicum.dto.RequestNotification;
 import ru.practicum.entity.TelegramUser;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.repository.BotRepository;
+import ru.practicum.util.Command;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -40,6 +41,7 @@ public class BotService {
                 user.setEwmId(ewmId);
                 repo.save(user);
             }
+            bot.sendMessage(user.getTelegramId(), prepareAuthWelcomeText());
         } else {
             throw new NotFoundException("User not found", String.format("User with telegram ID %d isn't exist", tgId));
         }
@@ -165,15 +167,6 @@ public class BotService {
         }
     }
 
-    private String prepareRequestRejectedText(RequestNotification request) {
-        return "Ваша заявка на участие в событии " + request.getEventTitle() + " отклонена организатором события, " +
-                "либо в виду того, что закончились свободные места.";
-    }
-
-    private String prepareRequestConfirmedText(RequestNotification request) {
-        return "Ваша заявка на участие в событии " + request.getEventTitle() + " подтверждена организатором события!";
-    }
-
     private void sendRequestCreated(RequestNotification request) {
         Optional<TelegramUser> maybeInitiator = repo.findByEwmId(request.getEventInitiatorId());
         if (maybeInitiator.isPresent()) {
@@ -189,6 +182,12 @@ public class BotService {
         } else {
             log.info("User with EWM ID {} isn't logged into the bot", request.getEventInitiatorId());
         }
+    }
+
+    private String prepareAuthWelcomeText() {
+        return "Вы привязали свой телеграм аккаунт на сайте приложения \"Explore With Me\"!\n" +
+                "Теперь вам доступен расширенный функционал оповещений.\n" +
+                "Для справки введите " + Command.HELP.getCommand();
     }
 
     private String prepareCanceledText(EventNotification event) {
@@ -228,9 +227,18 @@ public class BotService {
                 " и в котором вы планируете принять участие состоится уже через час!";
     }
 
+    private String prepareRequestConfirmedText(RequestNotification request) {
+        return "Ваша заявка на участие в событии " + request.getEventTitle() + " подтверждена организатором события!";
+    }
+
     private String prepareRequestCreatedText(RequestNotification request) {
         return "Пользователь " + request.getRequesterName() + " создал заявку на участие в вашем событии \"" +
                 request.getEventTitle() + "\", с номером " + request.getEventId() + ".\n" +
                 request.getRequesterName() + " ждет одобрения своей заявки!";
+    }
+
+    private String prepareRequestRejectedText(RequestNotification request) {
+        return "Ваша заявка на участие в событии " + request.getEventTitle() + " отклонена организатором события, " +
+                "либо в виду того, что закончились свободные места.";
     }
 }
