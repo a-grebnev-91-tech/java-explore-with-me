@@ -30,6 +30,7 @@ public class RequestService {
     private final RequestRepository requestRepo;
     private final UserRepository userRepo;
     private final EventRepository eventRepo;
+    private final NotificationService notificationService;
     private final RequestMapper mapper;
 
     public ParticipationRequestDto addRequest(long userId, long eventId) {
@@ -41,7 +42,11 @@ public class RequestService {
         checkRequestIsNotExistOrThrow(userId, eventId);
         ParticipationRequest request = createRequest(event, user);
         log.info("Create request for event with ID {} from user with ID {}", eventId, userId);
-        return mapper.entityToDto(requestRepo.save(request));
+        request = requestRepo.save(request);
+        if (request.getStatus().equals(RequestStatus.PENDING)) {
+            notificationService.requestStateChanged(request);
+        }
+        return mapper.entityToDto(request);
     }
 
     public ParticipationRequestDto cancelRequest(long userId, long requestId) {
@@ -65,7 +70,9 @@ public class RequestService {
         ParticipationRequest request = getRequestOrThrow(reqId);
         checkRequestIsUpdatableOrThrow(request, userId, eventId);
         log.info("Initiator with ID {} confirmed request with ID {} for event with ID {}", userId, reqId, eventId);
-        return mapper.entityToDto(confirm(request));
+        confirm(request);
+        notificationService.requestStateChanged(request);
+        return mapper.entityToDto(request);
     }
 
     public List<ParticipationRequestDto> findRequestsByEvent(long userId, long eventId) {
@@ -85,7 +92,9 @@ public class RequestService {
         ParticipationRequest request = getRequestOrThrow(reqId);
         checkRequestIsUpdatableOrThrow(request, userId, eventId);
         log.info("Initiator with ID {} rejected request with ID {} for event with ID {}", userId, reqId, eventId);
-        return mapper.entityToDto(reject(request));
+        reject(request);
+        notificationService.requestStateChanged(request);
+        return mapper.entityToDto(request);
     }
 
     private void checkEventExistingOrThrow(long eventId) {
@@ -217,7 +226,7 @@ public class RequestService {
 
     private boolean isEventFullyLoad(Event event) {
         long limit = event.getParticipantLimit();
-        if (limit == 0) return true;
+        if (limit == 0) return false;
         else return event.getConfirmedRequests() >= limit;
     }
 

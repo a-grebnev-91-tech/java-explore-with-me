@@ -1,5 +1,8 @@
 server:
-  port: ${STATS_SERVER_PORT}
+  port: ${TELEGRAM_BOT_PORT}
+bot:
+  name: ${EXPLORE_WITH_ME_BOT_NAME}
+  token: ${EXPLORE_WITH_ME_BOT_TOKEN}
 spring:
   jpa:
     properties:
@@ -23,20 +26,9 @@ spring:
   config:
     activate:
       on-profile: dev
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQL10Dialect
-        format_sql: true
-    hibernate:
-      ddl-auto: none
-  sql:
-    init:
-      mode: always
   datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/explore_with_me_stats
+    url: jdbc:postgresql:http://localhost:5432/telegram_users
     username: root
     password: root
 server:
-  port: 9090
+  port: 7070

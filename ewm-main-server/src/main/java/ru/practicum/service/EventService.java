@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.StatsClient;
 import ru.practicum.dto.event.*;
 import ru.practicum.dto.stats.EndpointHit;
 import ru.practicum.dto.stats.ViewStats;
@@ -34,6 +35,7 @@ public class EventService {
     private final EventRepository eventRepo;
     private final UserRepository userRepo;
     private final StatsClient statsClient;
+    private final NotificationService notificationService;
     private final EventMapper mapper;
     private final Patcher patcher;
 
@@ -108,6 +110,7 @@ public class EventService {
         couldBePublishedOrThrow(event);
         publish(event);
         updateViews(event);
+        notificationService.eventStateChanged(event);
         return mapper.entityToFullDto(event);
     }
 
@@ -116,6 +119,7 @@ public class EventService {
         couldBeRejectOrThrow(event);
         reject(event);
         updateViews(event);
+        notificationService.eventStateChanged(event);
         return mapper.entityToFullDto(event);
     }
 

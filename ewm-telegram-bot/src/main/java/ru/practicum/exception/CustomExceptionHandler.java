@@ -12,23 +12,16 @@ import javax.validation.ConstraintViolationException;
 @Slf4j
 @RestControllerAdvice
 public class CustomExceptionHandler {
-    @ResponseStatus(HttpStatus.CONFLICT)
-    @ExceptionHandler(ConflictException.class)
-    public ApiError handleConflict(ConflictException ex) {
-        log.warn("Conflict exception has occurred. Message: {}; Reason: {}", ex.getMessage(), ex.getReason());
-        return new ApiError(ex.getMessage(), ex.getReason(), "CONFLICT");
-    }
-
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler(ForbiddenOperationException.class)
-    public ApiError handleForbiddenOperationException(ForbiddenOperationException ex) {
-        log.warn("Forbidden operation detected. Message: {}", ex.getReason());
-        return new ApiError(ex.getMessage(), ex.getReason(), "FORBIDDEN");
-    }
-
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     public ApiError handleNotFound(NotFoundException ex) {
+        log.warn("Not found exception has occurred. Message: {}; Reason: {}", ex.getMessage(), ex.getReason());
+        return new ApiError(ex.getMessage(), ex.getReason(), "NOT_FOUND");
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ActionNotSupportedException.class)
+    public ApiError handleActionNotSupported(ActionNotSupportedException ex) {
         log.warn("Not found exception has occurred. Message: {}; Reason: {}", ex.getMessage(), ex.getReason());
         return new ApiError(ex.getMessage(), ex.getReason(), "NOT_FOUND");
     }
@@ -37,7 +30,6 @@ public class CustomExceptionHandler {
     @ExceptionHandler({
             ConstraintViolationException.class,
             MethodArgumentNotValidException.class,
-            ValidationException.class
     })
     public ApiError handleValidationException(Exception ex) {
         log.warn("Validation exception has occurred. Message: {}; Reason: {}", ex.getMessage(), ex.getMessage());
